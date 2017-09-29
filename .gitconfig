@@ -1,3 +1,5 @@
+[alias]
+	hist = log --pretty=format:\"%h %ad | %s%d [%an]\" --graph --date=short
 [user]
 	name = Luiz Nickel
 	email = luizaugustonickel@gmail.com
