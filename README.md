@@ -2,19 +2,16 @@
 
 Public release of my dotfiles setup.
 
-## Current Linux setup
+## Current Mac setup
 
-- Distro: Manjaro/GNOME 40.3.0
-- Kernel: 5.13.11-1-MANJARO
-- Shell: fish 3.3.1
+- Mac Version: 14.5 Sonoma
+- Shell: zsh 5.9 (x86_64-apple-darwin23.0)
 
-## Packages
+## Content
 
-According to the current `config.fish` setup:
+According to the current `.zshrc` setup:
 
-- starship (https://starship.rs/)
-- docker and redis (both aliased as `deckis`)
-  - docker (`sudo pacman -S docker`)
-  - redis docker image (`sudo docker pull redis`)
+- `gpp` and `gll` util functions for git
+- `bun` and `fnm` completions
 - bat aliased as `cat` (https://github.com/sharkdp/bat)
-- Onivim 2 aliased as `oni` (https://onivim.io/)
+- zsh-syntax-highlighting (https://github.com/zsh-users/zsh-syntax-highlighting)
