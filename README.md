@@ -11,7 +11,9 @@ Public release of my dotfiles setup.
 
 According to the current `.zshrc` setup:
 
+- oh-my-zsh (https://ohmyz.sh/)
 - `gpp` and `gll` util functions for git
 - `bun` and `fnm` completions
-- bat aliased as `cat` (https://github.com/sharkdp/bat)
+- `nvim` aliased as `vim`
+- `bat` aliased as `cat` (https://github.com/sharkdp/bat)
 - zsh-syntax-highlighting (https://github.com/zsh-users/zsh-syntax-highlighting)
