@@ -1,5 +1,15 @@
+# Oh My Zsh + Plugins
+export ZSH="$HOME/.oh-my-zsh"
+
+ZSH_THEME="robbyrussell"
+
+plugins=(git)
+
+source $ZSH/oh-my-zsh.sh
+
 # Aliases
 alias cat=bat
+alias vim=nvim
 
 # Pull from the remote branch and rebase
 function gll() {
@@ -21,8 +31,9 @@ export PATH="$BUN_INSTALL/bin:$PATH"
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
 # fnm
-FNM_PATH="/Users/luiznickel/Library/Application Support/fnm"
+eval "$(fnm env --use-on-cd)"
+FNM_PATH="/Users/luiz.nickel/Library/Application Support/fnm"
 if [ -d "$FNM_PATH" ]; then
-  export PATH="/Users/luiznickel/Library/Application Support/fnm:$PATH"
-  eval "`fnm env`"
+  export PATH="/Users/luiz.nickel/Library/Application Support/fnm:$PATH"
 fi
+
