@@ -110,10 +110,18 @@ PROMPT='λ %~/ $(git_prompt_info)%{$reset_color%}'
 
 alias cat=bat
 alias vim=nvim
+
+# git
 alias gaa="git add . && git reset AGENTS.md CLAUDE.md"
+alias gd="git diff"
+alias gl="git pull"
+alias gst="git status"
+alias gc="git commit"
+
 alias oc="opencode"
 alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
 
+# dirs
 alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
