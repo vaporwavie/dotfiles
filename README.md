@@ -17,3 +17,4 @@ According to the current `.zshrc` setup:
 - `nvim` aliased as `vim`
 - `bat` aliased as `cat` (https://github.com/sharkdp/bat)
 - zsh-syntax-highlighting (https://github.com/zsh-users/zsh-syntax-highlighting)
+- `.pi` agent settings and keyword-based model routing extension

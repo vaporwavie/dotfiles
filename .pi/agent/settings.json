@@ -1,0 +1,10 @@
+{
+  "lastChangelogVersion": "0.65.2",
+  "theme": "light",
+  "defaultProvider": "openai-codex",
+  "defaultModel": "gpt-5.4-mini",
+  "defaultThinkingLevel": "high",
+  "hideThinkingBlock": true,
+  "steeringMode": "one-at-a-time",
+  "enableSkillCommands": true
+}
