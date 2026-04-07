@@ -2,6 +2,19 @@
 
 Public release of my dotfiles setup.
 
+## Install
+
+```sh
+./bootstrap.sh
+```
+
+This copies tracked top-level dotfiles from the repo into `$HOME`, backing up any replaced paths into `~/.dotfiles-backup/<timestamp>`.
+
+Useful options:
+
+- `./bootstrap.sh --dry-run` to preview changes
+- `TARGET_ROOT=/some/other/home ./bootstrap.sh` to install somewhere else
+
 ## Current Mac setup
 
 - Mac Version: 14.5 Sonoma
