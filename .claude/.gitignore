@@ -1,0 +1,8 @@
+*
+!.gitignore
+!README.md
+!settings.json
+!skills/
+skills/*
+!skills/frontend-design/
+!skills/frontend-design/SKILL.md

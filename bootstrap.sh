@@ -11,7 +11,7 @@ usage() {
   cat <<'EOF'
 Usage: ./bootstrap.sh [--dry-run]
 
-Copy tracked top-level dotfiles from this repo into TARGET_ROOT (default: $HOME).
+Copy tracked dotfiles from this repo into TARGET_ROOT (default: $HOME).
 Existing targets are backed up to BACKUP_ROOT before being replaced.
 
 Examples:
@@ -39,7 +39,7 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-list_entries() {
+list_paths() {
   if git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     git -C "$repo_root" ls-files | awk -F/ '
       $1 ~ /^\./ &&
@@ -47,16 +47,22 @@ list_entries() {
       $1 != ".github" &&
       $1 != ".DS_Store" &&
       $1 != ".dotfiles-backup" {
-        print $1
+        print $0
       }
     ' | sort -u
   else
-    find "$repo_root" -mindepth 1 -maxdepth 1 -name '.*' \
-      ! -name '.git' \
-      ! -name '.github' \
-      ! -name '.DS_Store' \
-      ! -name '.dotfiles-backup' \
-      -exec basename {} \; | sort -u
+    find "$repo_root" \
+      \( -path "$repo_root/.git" -o -path "$repo_root/.git/*" \
+      -o -path "$repo_root/.github" -o -path "$repo_root/.github/*" \
+      -o -path "$repo_root/.dotfiles-backup" -o -path "$repo_root/.dotfiles-backup/*" \) -prune -o \
+      \( -type f -o -type l \) -print |
+      while IFS= read -r path; do
+        rel="${path#$repo_root/}"
+        first="${rel%%/*}"
+        if [[ "$first" == .* && "$first" != ".DS_Store" ]]; then
+          printf '%s\n' "$rel"
+        fi
+      done | sort -u
   fi
 }
 
@@ -99,9 +105,9 @@ install_path() {
   cp -PR "$src" "$dest"
 }
 
-entries="$(list_entries)"
+paths="$(list_paths)"
 
-if [[ -z "$entries" ]]; then
+if [[ -z "$paths" ]]; then
   echo "No dotfiles found to install."
   exit 0
 fi
@@ -112,38 +118,38 @@ skipped=0
 
 echo "Installing dotfiles into $target_root"
 
-while IFS= read -r entry; do
-  [[ -n "$entry" ]] || continue
+while IFS= read -r rel_path; do
+  [[ -n "$rel_path" ]] || continue
 
-  src="$repo_root/$entry"
-  dest="$target_root/$entry"
+  src="$repo_root/$rel_path"
+  dest="$target_root/$rel_path"
 
   if [[ "$src" == "$dest" ]]; then
-    echo "Refusing to install $entry onto itself." >&2
+    echo "Refusing to install $rel_path onto itself." >&2
     exit 1
   fi
 
   if ! paths_differ "$src" "$dest"; then
-    echo "skip    $entry (already up to date)"
+    echo "skip    $rel_path (already up to date)"
     skipped=$((skipped + 1))
     continue
   fi
 
   if [[ -e "$dest" || -L "$dest" ]]; then
-    echo "backup  $entry -> $backup_root/$entry"
+    echo "backup  $rel_path -> $backup_root/$rel_path"
     if [[ "$dry_run" -eq 0 ]]; then
-      backup_path "$dest" "$entry"
+      backup_path "$dest" "$rel_path"
     fi
     backed_up=$((backed_up + 1))
   fi
 
-  echo "install $entry -> $dest"
+  echo "install $rel_path -> $dest"
   if [[ "$dry_run" -eq 0 ]]; then
     install_path "$src" "$dest"
   fi
   installed=$((installed + 1))
 done <<EOF
-$entries
+$paths
 EOF
 
 if [[ "$dry_run" -eq 1 ]]; then
