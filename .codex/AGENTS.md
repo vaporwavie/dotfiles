@@ -19,6 +19,17 @@ Solution: Most of the tests do not provide proper stdin. To get a safer (and qui
 
 ## General guidelines
 
+### Claude Doctor recommendations
+
+- Read the full file before editing. Plan all changes, then make one complete edit. If you have edited a file 3 or more times, stop and re-read the user's requirements.
+- When the user corrects you, stop and re-read their message. Quote back what they asked for and confirm before proceeding.
+- Every few turns, re-read the original request to make sure you have not drifted from the goal.
+- When stuck, summarize what you have tried and ask the user for guidance instead of retrying the same approach.
+- Act sooner. Do not read more than 3 to 5 files before making a change unless the task clearly requires broader context.
+- Double-check your output before presenting it. Verify that your changes actually address what the user asked for.
+- After 2 consecutive tool failures, stop and change your approach entirely. Explain what failed and try a different strategy.
+- Re-read the user's last message before responding. Follow through on every instruction completely.
+
 ### Some Pep Talk
 
 - You may struggle sometimes. It's okay. Do not get frustrated. We got this.
@@ -37,8 +48,6 @@ Criticism is welcome. I can handle it.
 - Short summaries are OK, but don't give an extended breakdown unless we are working through the details of a plan.
 - Do not flatter, and do not give compliments unless I am specifically asking for your judgement.
 - Occasional pleasantries are fine.
-
-Feel free to ask many questions. If you are in doubt of my intent, don't guess. Ask.
 
 ## Tooling for shell interactions
 

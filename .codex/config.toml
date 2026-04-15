@@ -27,5 +27,9 @@ hide_full_access_warning = true
 theme = "inspired-github"
 status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-remaining", "context-used", "used-tokens"]
 
+[mcp_servers.paper]
+enabled = true
+url = "http://127.0.0.1:29979/mcp"
+
 [plugins."github@openai-curated"]
 enabled = true
