@@ -30,8 +30,9 @@ fpath=($HOME/.zsh/completions $fpath)
 autoload -Uz compinit
 () {
   setopt local_options extendedglob
-  if [[ -n $HOME/.zcompdump(#qN.mh+24) ]] || [[ ! -f $HOME/.zcompdump ]]; then
-    compinit
+  # Full audit once a week; otherwise use the cached dump (-C skips compaudit entirely)
+  if [[ -n $HOME/.zcompdump(#qN.mh+168) ]] || [[ ! -f $HOME/.zcompdump ]]; then
+    compinit -u
   else
     compinit -C
   fi
@@ -110,13 +111,17 @@ PROMPT='λ %~/ $(git_prompt_info)%{$reset_color%}'
 
 alias cat=bat
 alias vim=nvim
+alias c="open $1 -a \"Cursor\""
+alias claude="CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
 
 # git
+alias ga="git add"
 alias gaa="git add . && git reset AGENTS.md CLAUDE.md"
 alias gd="git diff"
 alias gl="git pull"
 alias gst="git status"
 alias gc="git commit"
+alias gco="git checkout"
 
 alias oc="opencode"
 alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
@@ -200,3 +205,4 @@ gmm() {
 eval "$(fnm env --use-on-cd)"
 
 source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
