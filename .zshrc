@@ -130,6 +130,46 @@ alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
 alias cx="codex -c model_reasoning_effort=medium"
 alias cxx="codex -c model_reasoning_effort=xhigh"
 
+function agent_welcome() {
+  [[ -o interactive ]] || return 0
+
+  # Each row: "plain text used for width|colored text rendered to screen"
+  local -a rows=(
+    "agents|%B%F{244}agents%f%b"
+    "|"
+    "cc    Opus 4.7   256k ctx|%F{245}cc%f    Opus 4.7   %F{252}256k ctx%f"
+    "ccx   Opus 4.7   1M ctx|%F{245}ccx%f   Opus 4.7   %F{252}1M ctx%f"
+    "cx    GPT 5.5    medium effort|%F{245}cx%f    GPT 5.5    %F{252}medium effort%f"
+    "cxx   GPT 5.5    xhigh effort|%F{245}cxx%f   GPT 5.5    %F{252}xhigh effort%f"
+  )
+
+  local pad=2 width=0 row plain colored
+  for row in $rows; do
+    plain=${row%%|*}
+    (( ${#plain} > width )) && width=${#plain}
+  done
+  local inner=$(( width + pad * 2 ))
+
+  local hline=${(l:inner::─:):-}
+  print -P "%F{240}╭${hline}╮%f"
+  for row in $rows; do
+    plain=${row%%|*}
+    colored=${row#*|}
+    if [[ -z $plain ]]; then
+      print -P "%F{240}├${hline}┤%f"
+    else
+      local trail=$(( inner - pad - ${#plain} - pad ))
+      printf '\e[38;5;240m│\e[0m%*s' $pad ''
+      print -nP -- "$colored"
+      printf '%*s\e[38;5;240m│\e[0m\n' $(( pad + trail )) ''
+    fi
+  done
+  print -P "%F{240}╰${hline}╯%f"
+  print
+}
+
+agent_welcome
+
 # dirs
 alias -g ...='../..'
 alias -g ....='../../..'
@@ -209,4 +249,3 @@ gmm() {
 eval "$(fnm env --use-on-cd)"
 
 source /opt/homebrew/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
-
