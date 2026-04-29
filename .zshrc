@@ -111,8 +111,8 @@ PROMPT='λ %~/ $(git_prompt_info)%{$reset_color%}'
 
 alias cat=bat
 alias vim=nvim
-alias c="open $1 -a \"Cursor\""
-alias claude="CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
+alias cc="CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
+alias ccx="CLAUDE_CODE_DISABLE_1M_CONTEXT=0 CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions --model claude-opus-4-7"
 
 # git
 alias ga="git add"
@@ -125,6 +125,10 @@ alias gco="git checkout"
 
 alias oc="opencode"
 alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
+
+# codex — config.toml default is "high"; aliases are per-invocation overrides
+alias cx="codex -c model_reasoning_effort=medium"
+alias cxx="codex -c model_reasoning_effort=xhigh"
 
 # dirs
 alias -g ...='../..'
