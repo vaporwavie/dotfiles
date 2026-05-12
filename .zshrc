@@ -30,11 +30,14 @@ fpath=($HOME/.zsh/completions $fpath)
 autoload -Uz compinit
 () {
   setopt local_options extendedglob
-  # Full audit once a week; otherwise use the cached dump (-C skips compaudit entirely)
-  if [[ -n $HOME/.zcompdump(#qN.mh+168) ]] || [[ ! -f $HOME/.zcompdump ]]; then
-    compinit -u
-  else
+  # Full audit once a week; otherwise use the cached dump (-C skips compaudit entirely).
+  # Glob qualifier must be evaluated in a globbing context — [[ ]] doesn't expand it.
+  local -a _dump
+  _dump=( $HOME/.zcompdump(Nmh-168) )
+  if (( ${#_dump} )); then
     compinit -C
+  else
+    compinit -u
   fi
 }
 
@@ -76,8 +79,7 @@ export LSCOLORS="Gxfxcxdxbxegedabagacad"
 export LS_COLORS="di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 alias ls='ls -G'
 
-autoload -Uz url-quote-magic bracketed-paste-magic
-zle -N self-insert url-quote-magic
+autoload -Uz bracketed-paste-magic
 zle -N bracketed-paste bracketed-paste-magic
 
 # gets the current branch from git
@@ -111,12 +113,13 @@ PROMPT='λ %~/ $(git_prompt_info)%{$reset_color%}'
 
 alias cat=bat
 alias vim=nvim
-alias cc="CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
+alias c="open -a Cursor"
+alias cc="CLAUDE_CODE_DISABLE_1M_CONTEXT=1 CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
 alias ccx="CLAUDE_CODE_DISABLE_1M_CONTEXT=0 CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions --model claude-opus-4-7"
 
 # git
 alias ga="git add"
-alias gaa="git add . && git reset AGENTS.md CLAUDE.md"
+alias gaa="git add ."
 alias gd="git diff"
 alias gl="git pull"
 alias gst="git status"
@@ -130,42 +133,14 @@ alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
 alias cx="codex -c model_reasoning_effort=medium"
 alias cxx="codex -c model_reasoning_effort=xhigh"
 
+# kvm
+alias engine="bash ~/Workspace/kvm/engine.sh"
+alias pnmac="bash ~/Workspace/kvm/pnmac.sh"
+
 function agent_welcome() {
   [[ -o interactive ]] || return 0
 
-  # Each row: "plain text used for width|colored text rendered to screen"
-  local -a rows=(
-    "agents|%B%F{244}agents%f%b"
-    "|"
-    "cc    Opus 4.7   256k ctx|%F{245}cc%f    Opus 4.7   %F{252}256k ctx%f"
-    "ccx   Opus 4.7   1M ctx|%F{245}ccx%f   Opus 4.7   %F{252}1M ctx%f"
-    "cx    GPT 5.5    medium effort|%F{245}cx%f    GPT 5.5    %F{252}medium effort%f"
-    "cxx   GPT 5.5    xhigh effort|%F{245}cxx%f   GPT 5.5    %F{252}xhigh effort%f"
-  )
-
-  local pad=2 width=0 row plain colored
-  for row in $rows; do
-    plain=${row%%|*}
-    (( ${#plain} > width )) && width=${#plain}
-  done
-  local inner=$(( width + pad * 2 ))
-
-  local hline=${(l:inner::─:):-}
-  print -P "%F{240}╭${hline}╮%f"
-  for row in $rows; do
-    plain=${row%%|*}
-    colored=${row#*|}
-    if [[ -z $plain ]]; then
-      print -P "%F{240}├${hline}┤%f"
-    else
-      local trail=$(( inner - pad - ${#plain} - pad ))
-      printf '\e[38;5;240m│\e[0m%*s' $pad ''
-      print -nP -- "$colored"
-      printf '%*s\e[38;5;240m│\e[0m\n' $(( pad + trail )) ''
-    fi
-  done
-  print -P "%F{240}╰${hline}╯%f"
-  print
+  print -P "%F{244}agents:%f %F{245}cc%f, %F{245}ccx%f, %F{245}cx%f, %F{245}cxx%f"
 }
 
 agent_welcome
@@ -176,11 +151,6 @@ alias -g ....='../../..'
 alias -g .....='../../../..'
 alias md='mkdir -p'
 alias rd=rmdir
-
-# force update neovim whenever I do something stupid
-function nvu() {
-  nvim --headless "+Lazy! sync" +qa
-}
 
 # little wrapper to ask questions to claude (haiku to make it faster)
 function ask() {
@@ -247,5 +217,3 @@ gmm() {
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
 eval "$(fnm env --use-on-cd)"
-
-source /opt/homebrew/opt/zsh-fast-syntax-highlighting/share/zsh-fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh
