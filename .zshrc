@@ -32,12 +32,17 @@ autoload -Uz compinit
   setopt local_options extendedglob
   # Full audit once a week; otherwise use the cached dump (-C skips compaudit entirely).
   # Glob qualifier must be evaluated in a globbing context — [[ ]] doesn't expand it.
-  local -a _dump
-  _dump=( $HOME/.zcompdump(Nmh-168) )
-  if (( ${#_dump} )); then
-    compinit -C
+  local zdump=$HOME/.zcompdump
+  local -a _fresh
+  _fresh=( $zdump(Nmh-168) )
+  if (( ${#_fresh} )); then
+    compinit -C -d $zdump
   else
-    compinit -u
+    compinit -i -d $zdump
+  fi
+  # Bytecode-compile the dump so subsequent shells parse less.
+  if [[ -s $zdump && (! -s $zdump.zwc || $zdump -nt $zdump.zwc) ]]; then
+    zcompile $zdump
   fi
 }
 
@@ -73,8 +78,6 @@ autoload -U edit-command-line
 zle -N edit-command-line
 bindkey '\C-x\C-e' edit-command-line
 
-autoload -U colors && colors
-
 export LSCOLORS="Gxfxcxdxbxegedabagacad"
 export LS_COLORS="di=1;36:ln=35:so=32:pi=33:ex=31:bd=34;46:cd=34;43:su=30;41:sg=30;46:tw=30;42:ow=30;43"
 alias ls='ls -G'
@@ -94,22 +97,69 @@ function git_current_branch() {
   echo ${ref#refs/heads/}
 }
 
-function parse_git_dirty() {
-  local STATUS
-  STATUS=$(GIT_OPTIONAL_LOCKS=0 command git status --porcelain --ignore-submodules=dirty 2>/dev/null | head -n 1)
-  [[ -n $STATUS ]] && echo "*"
-}
+# --- Async git prompt (zsh-async) ----------------------------------------
+# The branch name is cheap and resolved synchronously; the dirty marker
+# (`*`) is computed in a background worker and the prompt is redrawn when
+# it arrives. Net result: prompt never blocks on `git status`.
 
-function git_prompt_info() {
-  GIT_OPTIONAL_LOCKS=0 command git rev-parse --git-dir &>/dev/null || return 0
+source $HOME/.zsh/async.zsh
+async_init
+
+typeset -g _git_branch=""
+typeset -g _git_dirty=""
+typeset -g _git_last_dir=""
+
+_git_branch_sync() {
   local ref
   ref=$(GIT_OPTIONAL_LOCKS=0 command git symbolic-ref --short HEAD 2>/dev/null) \
     || ref=$(GIT_OPTIONAL_LOCKS=0 command git rev-parse --short HEAD 2>/dev/null) \
-    || return 0
-  echo "%{$fg[green]%}${ref:gs/%/%%}$(parse_git_dirty)%{$reset_color%} "
+    || return 1
+  print -r -- "${ref:gs/%/%%}"
 }
 
-PROMPT='λ %~/ $(git_prompt_info)%{$reset_color%}'
+_git_dirty_async() {
+  cd -q "$1"
+  local s
+  s=$(GIT_OPTIONAL_LOCKS=0 command git status --porcelain --ignore-submodules=dirty 2>/dev/null | head -n 1)
+  [[ -n $s ]] && print -n '*'
+}
+
+_git_async_callback() {
+  local job=$1 code=$2 output=$3
+  [[ $job == '[async]' ]] && return
+  if [[ $job == _git_dirty_async ]]; then
+    _git_dirty=$output
+    zle && zle reset-prompt
+  fi
+}
+
+async_start_worker git_prompt_worker -n
+async_register_callback git_prompt_worker _git_async_callback
+
+_git_prompt_precmd() {
+  if ! command git rev-parse --git-dir &>/dev/null; then
+    _git_branch=""; _git_dirty=""; _git_last_dir=""
+    return
+  fi
+  _git_branch=$(_git_branch_sync)
+  # Reset dirty marker on directory change so we don't show a stale `*`.
+  if [[ $PWD != $_git_last_dir ]]; then
+    _git_dirty=""
+    _git_last_dir=$PWD
+  fi
+  async_flush_jobs git_prompt_worker
+  async_job git_prompt_worker _git_dirty_async "$PWD"
+}
+
+git_prompt_info() {
+  [[ -n $_git_branch ]] || return 0
+  print -n "%F{green}${_git_branch}${_git_dirty}%f "
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _git_prompt_precmd
+
+PROMPT='λ %~/ $(git_prompt_info)%f'
 
 alias cat=bat
 alias vim=nvim
@@ -216,4 +266,13 @@ gmm() {
 
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
-eval "$(fnm env --use-on-cd)"
+# Lazy-load fnm: avoids the ~10–20ms `fnm env` eval and the chpwd hook
+# until you actually run node/npm/npx/pnpm/yarn/corepack in this shell.
+_fnm_lazy_load() {
+  unfunction node npm npx pnpm yarn corepack 2>/dev/null
+  eval "$(fnm env --use-on-cd)"
+}
+for _cmd in node npm npx pnpm yarn corepack; do
+  eval "${_cmd}() { _fnm_lazy_load; ${_cmd} \"\$@\"; }"
+done
+unset _cmd

@@ -27,12 +27,15 @@ Useful options:
 
 The repo currently includes:
 
-- oh-my-zsh (https://ohmyz.sh/)
-- `gpp` and `gll` util functions for git
+- Hand-rolled zsh config (no oh-my-zsh) — `.zshrc`, `.zshenv`, `.zprofile`
+  - Cached `compinit` with weekly audit + `zcompile`d dump
+  - Async git prompt via vendored [zsh-async](https://github.com/mafredri/zsh-async) at `.zsh/async.zsh` (branch synchronous, dirty marker in background worker)
+  - Lazy-loaded `fnm` (node/npm/npx/pnpm/yarn/corepack stubs swap themselves in on first use)
+  - `.zshenv` intentionally empty; cargo/brew/orbstack live in `.zprofile`
+- `gpp`, `gll`, `gds`, `gmm` util functions for git
 - `bun` and `fnm` completions
 - `nvim` aliased as `vim`
 - `bat` aliased as `cat` (https://github.com/sharkdp/bat)
-- zsh-syntax-highlighting (https://github.com/zsh-users/zsh-syntax-highlighting)
 - `.pi` agent settings and keyword-based model routing extension
 - `.codex` non-sensitive durable config (`config.toml`, `AGENTS.md`, and rules)
 - `.claude` Claude Code settings and a repo-safe frontend design skill
