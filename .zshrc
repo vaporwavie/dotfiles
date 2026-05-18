@@ -173,7 +173,7 @@ alias gaa="git add ."
 alias gd="git diff"
 alias gl="git pull"
 alias gst="git status"
-alias gc="git commit"
+alias gc="git commit -S"
 alias gco="git checkout"
 
 alias oc="opencode"
@@ -256,7 +256,7 @@ gmm() {
 
   command git checkout main && \
     command git pull origin main && \
-    command git merge "$branch" && \
+    command git merge -S "$branch" && \
     command git push origin main && \
     command git branch -d "$branch" && \
     command git push origin --delete "$branch"
@@ -264,15 +264,58 @@ gmm() {
   echo "Merged, pushed, and deleted '$branch'."
 }
 
+# fzf — fuzzy completion (^T = files, ^R = history, alt-c = cd).
+# Source key-bindings only if fzf is on the path; cheap (no subprocess).
+if [[ -d /opt/homebrew/opt/fzf/shell ]]; then
+  source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
+  source /opt/homebrew/opt/fzf/shell/completion.zsh
+  # Use rg for file-listing — respects .gitignore, faster than `find`.
+  if (( $+commands[rg] )); then
+    export FZF_DEFAULT_COMMAND='rg --files --hidden --follow --glob "!.git"'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  fi
+  export FZF_DEFAULT_OPTS='--height 40% --layout=reverse --border --info=inline'
+fi
+
+# bat — pager + man-page colorizer; matches the active ghostty theme.
+if (( $+commands[bat] )); then
+  export BAT_THEME="ansi"
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+  export MANROFFOPT="-c"
+fi
+
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
 # Lazy-load fnm: avoids the ~10–20ms `fnm env` eval and the chpwd hook
 # until you actually run node/npm/npx/pnpm/yarn/corepack in this shell.
-_fnm_lazy_load() {
-  unfunction node npm npx pnpm yarn corepack 2>/dev/null
-  eval "$(fnm env --use-on-cd)"
-}
+# Wrappers redefine the loader inline so they survive Claude Code's shell
+# snapshot, which drops underscore-prefixed functions.
 for _cmd in node npm npx pnpm yarn corepack; do
-  eval "${_cmd}() { _fnm_lazy_load; ${_cmd} \"\$@\"; }"
+  eval "${_cmd}() {
+    unfunction node npm npx pnpm yarn corepack 2>/dev/null
+    eval \"\$(fnm env --use-on-cd)\"
+    ${_cmd} \"\$@\"
+  }"
 done
 unset _cmd
+
+# Strip macOS Gatekeeper quarantine from a globally-installed npm package's
+# native binaries. Sequoia trashes unsigned Rust/Go binaries (e.g. @openai/codex)
+# the first time they run, leaving ENOENT on subsequent invocations.
+#
+#   unquarantine-global @openai/codex          # one package
+#   unquarantine-global                        # entire global node_modules
+unquarantine-global() {
+  local root
+  root="$(npm root -g 2>/dev/null)" || { echo "npm not available" >&2; return 1 }
+  local target="${root}${1:+/$1}"
+  [[ -e $target ]] || { echo "not found: $target" >&2; return 1 }
+  xattr -dr com.apple.quarantine "$target" 2>/dev/null
+  echo "stripped quarantine: $target"
+}
+
+# Reinstall @openai/codex and immediately strip quarantine so Gatekeeper
+# doesn't delete the vendored binary on first launch.
+codex-reinstall() {
+  npm install -g @openai/codex "$@" && unquarantine-global @openai/codex
+}
