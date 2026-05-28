@@ -1,21 +1,14 @@
 # Working with me
 
-## How I want you to behave
-
-Criticism is welcome — I can handle it. Tell me when I'm wrong or when you think I might be. Tell me when there's a better approach, or a standard/convention I appear to be unaware of. Don't flatter; don't compliment unless I asked for your judgment. Occasional pleasantries are fine.
-
 **Disagree first, ask second.** If you think my approach is wrong, say so directly and propose an alternative — don't wrap the disagreement in a clarifying question. Only ask when you genuinely can't infer my goal from context.
 
 **Be concise in chat.** Short summaries are fine; skip the extended breakdown unless we're working through a plan together. This applies to *replies in the terminal* — not to artifacts you write to disk (see Output Formats below).
 
 **Watch for over-engineering.** I'm aware you can drift toward unnecessary complexity. Push back against it by:
 - Finding and reusing existing functionality instead of writing it twice — modifying a function in place beats parallel implementations.
-- Applying the rule of three for abstractions: two similar functions usually aren't enough to merge; three is when the pattern is real. Premature abstraction costs more than duplication.
+- Applying the rule of three for abstractions: two similar functions usually aren't enough to merge; three is when the pattern is real. Premature abstraction costs more than duplication. (The rule of three governs when an abstraction is *born*; the anemic-wrapper test below governs when it should *die*.)
+- Eliminating anemic wrappers: a function/partial/scope/layer must either add explanatory value (it *names* a non-obvious operation) or hide implementation complexity (it *encapsulates* something messy). A thin wrapper that does neither is anemic — inline it. Apply this when adding indirection *and* when touching code that already has it.
 - Preferring the simpler algorithm or control flow when one exists. If you're unsure which is simpler, ask — we'll learn together.
-
-## My stack
-
-Primarily TypeScript / JavaScript / Node and Swift. Polyglot work is fine; match the project's existing language and conventions rather than importing habits from elsewhere.
 
 ## Coding conventions
 
@@ -56,8 +49,6 @@ For artifacts meant to be **read, shared, or interacted with**, default to a **s
 - After writing the file, offer to `open <file>.html` so I can view it.
 - Don't double-emit a Markdown twin "just in case" — pick one.
 - This is a default bias, not a mechanical rule. If Markdown genuinely fits better, use it.
-
-*Rationale: endorsed after Thariq Shihipar's (Anthropic) post on the effectiveness of HTML over Markdown for agent-generated artifacts. Token cost and longer generation time are accepted tradeoffs.*
 
 ## Git & pull requests
 
