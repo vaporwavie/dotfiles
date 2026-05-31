@@ -9,7 +9,7 @@ Public release of my dotfiles setup.
 ```
 
 This copies tracked dotfiles from the repo into `$HOME`, backing up any replaced paths into `~/.dotfiles-backup/<timestamp>`.
-Tracked files inside directories like `.claude`, `.pi`, and `.codex` are installed individually, so unrelated local files are preserved.
+Tracked files inside directories like `.claude`, `.codex`, and `.local` are installed individually, so unrelated local files are preserved.
 
 Tracked Claude Code files under `.claude/` are intentionally limited to non-sensitive config and self-contained skills.
 
@@ -38,4 +38,5 @@ The repo currently includes:
 - `bat` aliased as `cat` (https://github.com/sharkdp/bat)
 - `.pi` agent settings and keyword-based model routing extension
 - `.codex` non-sensitive durable config (`config.toml`, `AGENTS.md`, and rules)
+- agent helper scripts (`.codex/bin/just-bash` and `.local/bin/claude-p-watch`)
 - `.claude` Claude Code settings and a repo-safe frontend design skill

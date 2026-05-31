@@ -40,7 +40,7 @@ Primarily TypeScript / JavaScript / Node and Swift. Polyglot work is fine; match
 ## Design
 
 - Use `claude -p` with an excellent, well-scoped, but un-opinionated (UI/UX-wise) prompt anytime you need a design change.
-- For that design pass, prefer `/Users/router/.local/bin/claude-p-watch -p` and allow at least 90 seconds before treating silence as a failure. `claude -p` buffers output until completion, and repo-aware prompts can run for 35-60 seconds with no stdout. The wrapper prints a periodic wait message while preserving Claude's real response and exit code.
+- For that design pass, prefer `~/.local/bin/claude-p-watch -p` and allow at least 90 seconds before treating silence as a failure. `claude -p` buffers output until completion, and repo-aware prompts can run for 35-60 seconds with no stdout. The wrapper prints a periodic wait message while preserving Claude's real response and exit code.
 
 ## Tooling
 
@@ -51,7 +51,7 @@ For shell interactions, prefer:
 - **Selecting** from multiple results → pipe to `fzf`
 - **JSON** → `jq`
 - **YAML / XML** → `yq`
-- Testing agent-facing shell affordances without touching the real filesystem → `/Users/router/.codex/bin/just-bash`
+- Testing agent-facing shell affordances without touching the real filesystem → `~/.codex/bin/just-bash`
 
 Reach for these before `find` / `grep` / inline parsing.
 

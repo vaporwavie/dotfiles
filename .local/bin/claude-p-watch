@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+set -u
+
+claude_bin="${CLAUDE_P_BIN:-claude}"
+interval="${CLAUDE_P_HEARTBEAT_SECONDS:-10}"
+stream="${CLAUDE_P_HEARTBEAT_STREAM:-stderr}"
+
+if [[ "$claude_bin" == */* ]]; then
+  if [[ ! -x "$claude_bin" ]]; then
+    echo "claude-p-watch: Claude binary is not executable: $claude_bin" >&2
+    exit 127
+  fi
+  claude_path="$claude_bin"
+else
+  if ! claude_path="$(command -v "$claude_bin")"; then
+    echo "claude-p-watch: Claude binary was not found on PATH: $claude_bin" >&2
+    exit 127
+  fi
+fi
+
+case "$interval" in
+  ''|*[!0-9]*)
+    echo "claude-p-watch: CLAUDE_P_HEARTBEAT_SECONDS must be a positive integer" >&2
+    exit 2
+    ;;
+esac
+
+if (( interval < 1 )); then
+  echo "claude-p-watch: CLAUDE_P_HEARTBEAT_SECONDS must be at least 1" >&2
+  exit 2
+fi
+
+heartbeat() {
+  local message="$1"
+  if [[ "$stream" == "stdout" ]]; then
+    printf '%s\n' "$message"
+  else
+    printf '%s\n' "$message" >&2
+  fi
+}
+
+state_dir="$(mktemp -d "${TMPDIR:-/tmp}/claude-p-watch.XXXXXX")"
+status_fifo="$state_dir/status"
+mkfifo "$status_fifo"
+exec 3<>"$status_fifo"
+
+cleanup() {
+  rm -rf "$state_dir"
+}
+trap cleanup EXIT
+
+(
+  "$claude_path" "$@" &
+  command_pid=$!
+
+  forward_runner_signal() {
+    local signal="$1"
+    kill "-$signal" "$command_pid" 2>/dev/null || true
+  }
+
+  trap 'forward_runner_signal TERM' TERM
+  trap 'forward_runner_signal INT' INT
+  trap 'forward_runner_signal HUP' HUP
+
+  wait "$command_pid"
+  status=$?
+  printf '%s\n' "$status" > "$status_fifo"
+  exit "$status"
+) &
+runner_pid=$!
+
+forward_signal() {
+  local signal="$1"
+  kill "-$signal" "$runner_pid" 2>/dev/null || true
+}
+
+trap 'forward_signal TERM' TERM
+trap 'forward_signal INT' INT
+trap 'forward_signal HUP' HUP
+
+start_time="$(date +%s)"
+
+while true; do
+  if IFS= read -r -t "$interval" status <&3; then
+    break
+  fi
+
+  if ! kill -0 "$runner_pid" 2>/dev/null; then
+    wait "$runner_pid"
+    status=$?
+    break
+  fi
+
+  now="$(date +%s)"
+  elapsed="$((now - start_time))"
+  heartbeat "[claude-p-watch] waiting for Claude output (${elapsed}s elapsed)"
+done
+
+wait "$runner_pid" 2>/dev/null || true
+
+exit "$status"
