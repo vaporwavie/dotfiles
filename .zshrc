@@ -287,12 +287,13 @@ fi
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
 # Lazy-load fnm: avoids the ~10–20ms `fnm env` eval and the chpwd hook
-# until you actually run node/npm/npx/pnpm/yarn/corepack in this shell.
+# until you actually run node/npm/npx/pnpm/yarn/corepack/codex in this shell.
+# (codex is installed as a global node binary, so it needs fnm on PATH too.)
 # Wrappers redefine the loader inline so they survive Claude Code's shell
 # snapshot, which drops underscore-prefixed functions.
-for _cmd in node npm npx pnpm yarn corepack; do
+for _cmd in node npm npx pnpm yarn corepack codex; do
   eval "${_cmd}() {
-    unfunction node npm npx pnpm yarn corepack 2>/dev/null
+    unfunction node npm npx pnpm yarn corepack codex 2>/dev/null
     eval \"\$(fnm env --use-on-cd)\"
     ${_cmd} \"\$@\"
   }"
