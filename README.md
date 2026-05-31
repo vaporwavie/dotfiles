@@ -38,5 +38,5 @@ The repo currently includes:
 - `bat` aliased as `cat` (https://github.com/sharkdp/bat)
 - `.pi` agent settings and keyword-based model routing extension
 - `.codex` non-sensitive durable config (`config.toml`, `AGENTS.md`, and rules)
-- agent helper scripts (`.codex/bin/just-bash` and `.local/bin/claude-p-watch`)
+- agent helper scripts (`.codex/bin/just-bash` shim for https://github.com/vercel-labs/just-bash and `.local/bin/claude-p-watch`)
 - `.claude` Claude Code settings and a repo-safe frontend design skill

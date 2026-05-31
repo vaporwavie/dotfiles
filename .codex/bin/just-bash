@@ -1,83 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-usage() {
-  cat <<'EOF'
-Usage:
-  just-bash [--keep] [--] 'shell script'
-  just-bash [--keep] -- -c 'shell script'
-  command | just-bash [--keep]
+package="${JUST_BASH_PACKAGE:-just-bash@3.0.1}"
 
-Run bash from a throwaway HOME and working directory. This protects the current
-repo from accidental relative-path writes, but it is not a security sandbox:
-absolute paths and external services are still real.
-
-Environment:
-  JUST_BASH_ROOT   temporary root directory
-  JUST_BASH_HOME   temporary home directory
-  JUST_BASH_WORK   temporary working directory
-  JUST_BASH_KEEP=1 keep the temporary root after exit
-EOF
-}
-
-keep="${JUST_BASH_KEEP:-0}"
-
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --keep)
-      keep=1
-      shift
-      ;;
-    -h|--help)
-      usage
-      exit 0
-      ;;
-    --)
-      shift
-      break
-      ;;
-    *)
-      break
-      ;;
-  esac
-done
-
-root="$(mktemp -d "${TMPDIR:-/tmp}/just-bash.XXXXXX")"
-
-cleanup() {
-  local status=$?
-  if [[ "$keep" == "1" ]]; then
-    printf 'just-bash: kept %s\n' "$root" >&2
-  else
-    rm -rf "$root"
-  fi
-  exit "$status"
-}
-trap cleanup EXIT
-
-mkdir -p "$root/home" "$root/tmp" "$root/work"
-
-export HOME="$root/home"
-export TMPDIR="$root/tmp"
-export XDG_CACHE_HOME="$root/home/.cache"
-export XDG_CONFIG_HOME="$root/home/.config"
-export XDG_DATA_HOME="$root/home/.local/share"
-export JUST_BASH_ROOT="$root"
-export JUST_BASH_HOME="$HOME"
-export JUST_BASH_WORK="$root/work"
-
-cd "$JUST_BASH_WORK"
-
-if [[ $# -eq 0 ]]; then
-  if [[ -t 0 && -t 1 ]]; then
-    /bin/bash
-  else
-    /bin/bash -s
-  fi
-elif [[ "$1" == "-c" ]]; then
-  /bin/bash "$@"
-else
-  script="$1"
-  shift
-  /bin/bash -lc "$script" bash "$@"
+if ! command -v npm >/dev/null 2>&1; then
+  echo "just-bash: npm is required to run $package" >&2
+  exit 127
 fi
+
+prefix="$(npm prefix -g 2>/dev/null || true)"
+
+if [[ -n "$prefix" && -x "$prefix/bin/just-bash" ]]; then
+  exec "$prefix/bin/just-bash" "$@"
+fi
+
+exec npm exec --yes --package "$package" -- just-bash "$@"
