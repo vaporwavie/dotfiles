@@ -1,8 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_DISABLE_1M_CONTEXT": "1",
-    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "0"
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
@@ -45,13 +43,9 @@
     "vercel@claude-plugins-official": true,
     "frontend-design@claude-plugins-official": true
   },
-  "alwaysThinkingEnabled": false,
   "promptSuggestionEnabled": false,
   "skipDangerousModePermissionPrompt": true,
   "theme": "auto",
   "terminalProgressBarEnabled": false,
-  "skipAutoPermissionPrompt": true,
-  "thinking": {
-    "type": "adaptive"
-  }
+  "skipAutoPermissionPrompt": true
 }
