@@ -1,6 +1,7 @@
 #!/bin/sh
 # Claude Code status line
 # Reads JSON from stdin, prints a styled one-liner.
+# Based on zsh PROMPT: λ %~/ $(git_prompt_info)%{$reset_color%}
 
 input=$(cat)
 
@@ -13,14 +14,20 @@ total_in=$(printf '%s' "$input" | jq -r '.context_window.total_input_tokens // 0
 total_out=$(printf '%s' "$input" | jq -r '.context_window.total_output_tokens // 0')
 
 # --- Derived values ---
-dir_name=$(basename "$cwd")
 total_tokens=$((total_in + total_out))
 
-# Git branch (skip locks, suppress errors)
+# Git branch and dirty status (skip locks, suppress errors)
 git_branch=""
+git_dirty=""
 if [ -n "$cwd" ] && git -C "$cwd" --no-optional-locks rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   git_branch=$(git -C "$cwd" --no-optional-locks symbolic-ref --short HEAD 2>/dev/null)
   [ -z "$git_branch" ] && git_branch=$(git -C "$cwd" --no-optional-locks rev-parse --short HEAD 2>/dev/null)
+
+  # Check for dirty working tree
+  if [ -n "$git_branch" ]; then
+    STATUS=$(git -C "$cwd" --no-optional-locks status --porcelain --ignore-submodules=dirty 2>/dev/null | head -n 1)
+    [ -n "$STATUS" ] && git_dirty="*"
+  fi
 fi
 
 # --- ANSI helpers ---
@@ -87,6 +94,19 @@ tok_in=$(fmt_num "$total_in")
 tok_out=$(fmt_num "$total_out")
 tok_section="${DIM}$(printf '%s' "$tok_total") (↑${tok_in} ↓${tok_out})${RESET}"
 
+# --- Lambda prompt section (matching zsh PROMPT) ---
+lambda_section="${FG_CYAN}λ${RESET}"
+
+# --- Directory (full path, matching %~/) ---
+dir_section="${FG_BLUE}${cwd}/${RESET}"
+
+# --- Git section (matching git_prompt_info with green + dirty indicator) ---
+if [ -n "$git_branch" ]; then
+  git_section="${FG_GREEN}${git_branch}${git_dirty}${RESET}"
+else
+  git_section=""
+fi
+
 # --- Model (with effort) ---
 if [ -n "$effort" ]; then
   model_section="${BOLD}${FG_CYAN}${model}${RESET} ${DIM}(${effort})${RESET}"
@@ -94,13 +114,10 @@ else
   model_section="${BOLD}${FG_CYAN}${model}${RESET}"
 fi
 
-# --- Directory ---
-dir_section="${FG_BLUE}${dir_name}${RESET}"
-
 # --- Output ---
-if [ -n "$git_branch" ]; then
-  git_section="${FG_MAGENTA}${git_branch}${RESET}"
-  printf "${model_section}${SEP}${dir_section}${SEP}${git_section}${SEP}${ctx_section}${SEP}${tok_section}\n"
+# Format: λ /path/to/dir/ branch* | model | ctx | tokens
+if [ -n "$git_section" ]; then
+  printf "${lambda_section} ${dir_section}${git_section}${SEP}${model_section}${SEP}${ctx_section}${SEP}${tok_section}\n"
 else
-  printf "${model_section}${SEP}${dir_section}${SEP}${ctx_section}${SEP}${tok_section}\n"
+  printf "${lambda_section} ${dir_section}${SEP}${model_section}${SEP}${ctx_section}${SEP}${tok_section}\n"
 fi

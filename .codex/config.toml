@@ -1,30 +1,318 @@
 model = "gpt-5.5"
+model_context_window = 1050000
+model_auto_compact_token_limit = 900000
+approval_policy = "never"
 sandbox_mode = "danger-full-access"
 network_access = true
 web_search = "live"
 service_tier = "fast"
 
+notify = ["/Users/router/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+model_reasoning_effort = "xhigh"
+
 [features]
+hooks = true
 unified_exec = true
 shell_snapshot = true
 multi_agent = true
 prevent_idle_sleep = true
 voice_transcription = true
-js_repl = true
+js_repl = false
+memories = true
+chronicle = true
+terminal_resize_reflow = true
+mentions_v2 = true
 
 [notice]
 hide_full_access_warning = true
 
-[notice.model_migrations]
-"gpt-5.2" = "gpt-5.2-codex"
-
 [tui]
-theme = "inspired-github"
-status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-remaining", "context-used", "used-tokens"]
+theme = "catppuccin-mocha"
+status_line = ["current-dir", "git-branch", "model-with-reasoning", "context-remaining", "context-used", "used-tokens", "pull-request-number", "branch-changes", "five-hour-limit", "weekly-limit"]
+status_line_use_colors = true
 
-[mcp_servers.paper]
-enabled = true
-url = "http://127.0.0.1:29979/mcp"
+[tui.model_availability_nux]
+"gpt-5.5" = 4
+
+[mcp_servers.node_repl]
+args = []
+command = "/Applications/Codex.app/Contents/Resources/cua_node/bin/node_repl"
+startup_timeout_sec = 120
+
+[mcp_servers.node_repl.env]
+NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
+NODE_REPL_NODE_MODULE_DIRS = "/Applications/Codex.app/Contents/Resources/cua_node/lib/node_modules"
+NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/cua_node/bin/node"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/router/.codex"
+CODEX_HOME = "/Users/router/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "72614174f4dad67a58d46a3ac759cffb45c92fa48a293af4c4ea35102ba391ba"
+BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
+NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
+NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
+BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
+BROWSER_USE_CODEX_APP_VERSION = "26.608.12217"
+CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
+
+[mcp_servers.vercel]
+command = "/Users/router/.local/bin/vercel-sdk-mcp"
+
+[mcp_servers.vercel.tools.projects-filter-project-envs]
+approval_mode = "approve"
+
+[mcp_servers.vercel.tools.projects-get-project-env]
+approval_mode = "approve"
+
+[mcp_servers.vercel.tools.logs-get-runtime-logs]
+approval_mode = "approve"
 
 [plugins."github@openai-curated"]
 enabled = true
+
+[plugins."documents@openai-primary-runtime"]
+enabled = true
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = true
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = true
+
+[plugins."computer-use@openai-bundled"]
+enabled = true
+
+[plugins."vercel@claude-plugins-official"]
+enabled = true
+
+[plugins."linear@openai-curated"]
+enabled = true
+
+[plugins."browser@openai-bundled"]
+enabled = true
+
+[plugins."chrome@openai-bundled"]
+enabled = true
+
+[marketplaces.openai-bundled]
+last_updated = "2026-06-12T01:35:24Z"
+source_type = "local"
+source = "/Users/router/.codex/.tmp/bundled-marketplaces/openai-bundled"
+
+[marketplaces.openai-primary-runtime]
+last_updated = "2026-06-07T23:47:08Z"
+source_type = "local"
+source = "/Users/router/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
+
+[marketplaces.claude-plugins-official]
+last_updated = "2026-06-12T13:53:48Z"
+last_revision = "df202fe49d81404902cf785b64c1c5f9cc0b0315"
+source_type = "git"
+source = "https://github.com/anthropics/claude-plugins-official.git"
+
+[memories]
+generate_memories = true
+use_memories = true
+disable_on_external_context = true
+
+[projects."/Users/router"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/jobs/10x-storefront"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/kvm"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-257"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-270"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-271"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-272"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-273"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-201"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-202"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-267"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/symphony-workspaces/10x-storefront/10X-276"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/juno-api"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/juno"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-18/goal-improve-my-internet-speed"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-18/goal-make-my-internet-network-faster"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-18/so-it-seems-that-i-can"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-19/goal-remove-any-references-files-repos"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-20/goal-check-if-my-computer-has"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-20/goal-download-grok-build-beta-https"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-20/how-effective-is-this-one-trick"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-20/goal-find-me-the-best-dictation"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-20/goal-find-me-the-best-possible"]
+trust_level = "trusted"
+
+[projects."/Users/router/Library/Application Support/com.conductor.app/bin"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-21-goal-make-my-mac-mini-faster"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-22/goal-bleach-and-scrub-everything-opencode"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-25/goal-make-my-firefox-nightly-quick"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-25/why-isn-t-my-safari-smooth"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-25/what-even-is-the-win-here"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-05-25/been-seeing-a-lot-of-these"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/med-ears"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/basso"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/lebre"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/chrome-vertical-tabs-toggle"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/altura/comes-and-goings"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-06-08/silly-question-codex-current-app-does"]
+trust_level = "trusted"
+
+[projects."/private/tmp/basso-tui-repo"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-06-09/files-mentioned-by-the-user-release"]
+trust_level = "trusted"
+
+[projects."/private/tmp/basso-smoke/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-1S69Rr/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-qQptiB/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-vZBP7X/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-o3EwuB/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-cuG2TF/repo"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-37CUmu/repo"]
+trust_level = "trusted"
+
+[projects."/private/tmp/basso-dispose-cleanup-r2U6GF/repo"]
+trust_level = "trusted"
+
+[projects."/Users/router/Documents/Codex/2026-06-10/goal-research-basis-on-how-to"]
+trust_level = "trusted"
+
+[projects."/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/basso-dispose-cleanup-o8l1w7/repo"]
+trust_level = "trusted"
+
+[projects."/Users/router/Workspace/dotfiles"]
+trust_level = "trusted"
+
+[apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_create_pull_request]
+approval_mode = "approve"
+
+[apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_create_issue]
+approval_mode = "approve"
+
+[hooks.state]
+
+[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:3854f8501763b92012b4def8de676279493adfbaec8cc1d00ce72b8e80341b1c"
+
+[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:1"]
+trusted_hash = "sha256:34d8e6e4abd36e2448fe0032fd7a20e075b3c985eea7290379689add51264a03"
+
+[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:2"]
+trusted_hash = "sha256:2ebad29288ff7fb558b111a94eea88404fdd80f7739be1bea8098ddea09b31d0"
+
+[desktop]
+ambient-suggestions-enabled = false
+followUpQueueMode = "steer"
+reviewDelivery = "detached"
+preventSleepWhileRunning = true
+keepRemoteControlAwakeWhilePluggedIn = true
+git-branch-prefix = "feature/"
+git-always-force-push = true
+git-create-pull-request-as-draft = false
+git-show-sidebar-pr-icons = true
+conversationDetailMode = "STEPS_COMMANDS"
+appearanceDarkCodeThemeId = "codex"
+show-context-window-usage = true
+usePointerCursors = true
+
+[desktop.open-in-target-preferences]
+global = "ghostty"
+
+[desktop.open-in-target-preferences.perPath]
+"/Users/router/.codex/worktrees/38b4/kvm" = "ghostty"
+
+[desktop.appearanceDarkChromeTheme]
+accent = "#0169cc"
+contrast = 50
+ink = "#fcfcfc"
+opaqueWindows = false
+surface = "#000000"
+
+[desktop.appearanceDarkChromeTheme.fonts]
+code = '"Jetbrains Mono"'
+ui = "Inter"
+
+[desktop.appearanceDarkChromeTheme.semanticColors]
+diffAdded = "#00a240"
+diffRemoved = "#e02e2a"
+skill = "#b06dff"

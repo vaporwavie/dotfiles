@@ -1,17 +1,3 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-package="${JUST_BASH_PACKAGE:-just-bash@3.0.1}"
-
-if ! command -v npm >/dev/null 2>&1; then
-  echo "just-bash: npm is required to run $package" >&2
-  exit 127
-fi
-
-prefix="$(npm prefix -g 2>/dev/null || true)"
-
-if [[ -n "$prefix" && -x "$prefix/bin/just-bash" ]]; then
-  exec "$prefix/bin/just-bash" "$@"
-fi
-
-exec npm exec --yes --package "$package" -- just-bash "$@"
+#!/bin/sh
+cd /Users/router/.codex/tools/just-bash || exit 1
+exec /Users/router/.amp/bin/bun run jb -- "$@"

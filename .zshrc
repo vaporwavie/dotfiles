@@ -4,7 +4,6 @@ export BUN_INSTALL="$HOME/.bun"
 
 path=(
   $HOME/.local/bin
-  $HOME/.opencode/bin
   $HOME/.amp/bin
   $HOME/.deno/bin
   $BUN_INSTALL/bin
@@ -164,8 +163,7 @@ PROMPT='λ %~/ $(git_prompt_info)%f'
 alias cat=bat
 alias vim=nvim
 alias c="open -a Cursor"
-alias cc="CLAUDE_CODE_DISABLE_1M_CONTEXT=1 CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
-alias ccx="CLAUDE_CODE_DISABLE_1M_CONTEXT=0 CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions --model claude-opus-4-7"
+alias cc="CLAUDE_CODE_NO_FLICKER=1 claude --dangerously-skip-permissions"
 
 # git
 alias ga="git add"
@@ -176,11 +174,10 @@ alias gst="git status"
 alias gc="git commit -S"
 alias gco="git checkout"
 
-alias oc="opencode"
 alias gfc="vim $HOME/Library/Application\ Support/com.mitchellh.ghostty/config"
 
 # codex — config.toml default is "high"; aliases are per-invocation overrides
-alias cx="codex -c model_reasoning_effort=medium"
+alias cx="$HOME/.local/bin/cx"
 alias cxx="codex -c model_reasoning_effort=xhigh"
 
 # kvm
@@ -190,7 +187,8 @@ alias pnmac="bash ~/Workspace/kvm/pnmac.sh"
 function agent_welcome() {
   [[ -o interactive ]] || return 0
 
-  print -P "%F{244}agents:%f %F{245}cc%f, %F{245}ccx%f, %F{245}cx%f, %F{245}cxx%f"
+  print -P "%F{244}codex:%f %F{245}cx%f, %F{245}cx -w%f, %F{245}cx -C <dir>%f"
+  print -P "%F{244}claude:%f %F{245}cc%f%f"
 }
 
 agent_welcome
@@ -201,34 +199,6 @@ alias -g ....='../../..'
 alias -g .....='../../../..'
 alias md='mkdir -p'
 alias rd=rmdir
-
-# little wrapper to ask questions to claude (haiku to make it faster)
-function ask() {
-  local model="claude-haiku-4-5-20251001"
-  local -a prompt_parts=()
-
-  while [[ $# -gt 0 ]]; do
-    case "$1" in
-      *)
-        prompt_parts+=("$1")
-        shift
-        ;;
-    esac
-  done
-
-  local prompt=""
-  if [[ ${#prompt_parts[@]} -gt 0 ]]; then
-    prompt="$(printf '%s ' "${prompt_parts[@]}")"
-    prompt="${prompt% }"
-  elif [[ ! -t 0 ]]; then
-    prompt="$(cat)"
-  else
-    echo "ask: provide a prompt argument or pipe text in" >&2
-    return 1
-  fi
-
-  claude --model "$model" --print -- "$prompt" | glow -
-}
 
 # quickly pulls remote to the current branch
 function gll() {
@@ -287,36 +257,37 @@ fi
 [[ -s "$HOME/.bun/_bun" ]] && source "$HOME/.bun/_bun"
 
 # Lazy-load fnm: avoids the ~10–20ms `fnm env` eval and the chpwd hook
-# until you actually run node/npm/npx/pnpm/yarn/corepack/codex in this shell.
-# (codex is installed as a global node binary, so it needs fnm on PATH too.)
+# until you actually run node/npm/npx/pnpm/yarn/corepack or a known global
+# Node CLI in this shell.
 # Wrappers redefine the loader inline so they survive Claude Code's shell
 # snapshot, which drops underscore-prefixed functions.
-for _cmd in node npm npx pnpm yarn corepack codex; do
+for _cmd in node npm npx pnpm yarn corepack vercel vc; do
   eval "${_cmd}() {
-    unfunction node npm npx pnpm yarn corepack codex 2>/dev/null
+    unfunction node npm npx pnpm yarn corepack vercel vc 2>/dev/null
     eval \"\$(fnm env --use-on-cd)\"
     ${_cmd} \"\$@\"
   }"
 done
 unset _cmd
 
-# Strip macOS Gatekeeper quarantine from a globally-installed npm package's
-# native binaries. Sequoia trashes unsigned Rust/Go binaries (e.g. @openai/codex)
-# the first time they run, leaving ENOENT on subsequent invocations.
-#
-#   unquarantine-global @openai/codex          # one package
-#   unquarantine-global                        # entire global node_modules
-unquarantine-global() {
-  local root
-  root="$(npm root -g 2>/dev/null)" || { echo "npm not available" >&2; return 1 }
-  local target="${root}${1:+/$1}"
-  [[ -e $target ]] || { echo "not found: $target" >&2; return 1 }
-  xattr -dr com.apple.quarantine "$target" 2>/dev/null
-  echo "stripped quarantine: $target"
+# >>> grok installer >>>
+export PATH="$HOME/.grok/bin:$PATH"
+fpath=(~/.grok/completions/zsh $fpath)
+autoload -Uz compinit && compinit -C
+# <<< grok installer <<<
+
+
+function grok() {
+  env \
+    VIBEPROXY_API_KEY="${VIBEPROXY_API_KEY:?Set VIBEPROXY_API_KEY}" \
+    XAI_API_KEY="${XAI_API_KEY:?Set XAI_API_KEY}" \
+    GROK_MODELS_BASE_URL="${GROK_MODELS_BASE_URL:-http://localhost:8317/v1}" \
+    RUST_LOG=error \
+    /Users/router/.grok/bin/grok "$@"
 }
 
-# Reinstall @openai/codex and immediately strip quarantine so Gatekeeper
-# doesn't delete the vendored binary on first launch.
-codex-reinstall() {
-  npm install -g @openai/codex "$@" && unquarantine-global @openai/codex
-}
+# bun completions
+[ -s "/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/tmp.1by5RiOPPT/_bun" ] && source "/private/var/folders/mz/830vr53s6233ywqkw8wkkbcr0000gn/T/tmp.1by5RiOPPT/_bun"
+
+# Pi
+export PATH="/Users/router/.local/share/fnm/node-versions/v22.19.0/installation/bin:$PATH"

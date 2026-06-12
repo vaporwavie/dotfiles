@@ -21,6 +21,12 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - Install obvious, well-known dependencies when the need is clear. Ask before adding anything heavyweight, niche, security-sensitive, or likely to bloat the lockfile.
 - Use English for code, comments, docs, examples, commits, configs, error messages, and tests.
 
+## Verification
+
+- agent-browser is the ONLY browser tool. Use it for all browser work — both while developing/iterating and for final verification. Never use Playwright (playwright MCP, `node_repl` playwright import, or any other browser driver) for this.
+- It is one continuous loop, not two passes: do not drive dev with Playwright and then re-verify with agent-browser. That duplicates the whole flow and burns tokens.
+- After every change, confirm UI/UX in agent-browser and fix any issues. Do not stop until all changes have been verified.
+
 ## Tooling
 
 - Files: `fd`

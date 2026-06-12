@@ -1,5 +1,11 @@
 eval $(/opt/homebrew/bin/brew shellenv zsh)
 
+typeset -U path
+path=(
+  $HOME/.local/bin
+  $path
+)
+
 # Rust toolchain (moved out of .zshenv so it isn't sourced for every
 # non-interactive `zsh -c …` invocation).
 [[ -s "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"

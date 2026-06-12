@@ -1,11 +1,9 @@
-# Local-only Claude state
-projects/
-shell-snapshots/
-todos/
-statsig/
-ide/
-history.jsonl
-*.log
-
-# OS / editor cruft
-.DS_Store
+*
+!.gitignore
+!README.md
+!settings.json
+!statusline.sh
+!skills/
+skills/*
+!skills/frontend-design/
+!skills/frontend-design/SKILL.md
