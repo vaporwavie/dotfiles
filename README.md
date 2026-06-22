@@ -37,7 +37,7 @@ The repo currently includes:
 - `bun` and `fnm` completions
 - `nvim` aliased as `vim`
 - [vim-with-a-hat](https://github.com/vaporwavie/vim-with-a-hat) wiring: Ghostty binds `cmd+shift+e` / `cmd+shift+b` to dump the screen/scrollback to a temp file, and the `_vh_accept_line` zsh hook opens that path in `vh` (a native GUI window) instead of running it
-- Ghostty config at `Library/Application Support/com.mitchellh.ghostty/config` (custom `grokday`/`groknight` themes live alongside it but aren't tracked)
+- Ghostty config at `Library/Application Support/com.mitchellh.ghostty/config`, plus the custom `grokday`/`groknight` themes it references under `…/themes/`
 - `bat` aliased as `cat` (https://github.com/sharkdp/bat)
 - `.pi` agent settings and keyword-based model routing extension
 - `.codex` non-sensitive durable config (`config.toml`, `AGENTS.md`, and rules)
