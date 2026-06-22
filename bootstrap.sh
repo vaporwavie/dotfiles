@@ -42,11 +42,12 @@ done
 list_paths() {
   if git -C "$repo_root" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     git -C "$repo_root" ls-files | awk -F/ '
-      $1 ~ /^\./ &&
-      $1 != ".git" &&
-      $1 != ".github" &&
-      $1 != ".DS_Store" &&
-      $1 != ".dotfiles-backup" {
+      ($1 ~ /^\./ &&
+       $1 != ".git" &&
+       $1 != ".github" &&
+       $1 != ".DS_Store" &&
+       $1 != ".dotfiles-backup") ||
+      index($0, "Library/Application Support/") == 1 {
         print $0
       }
     ' | sort -u
@@ -59,7 +60,7 @@ list_paths() {
       while IFS= read -r path; do
         rel="${path#$repo_root/}"
         first="${rel%%/*}"
-        if [[ "$first" == .* && "$first" != ".DS_Store" ]]; then
+        if { [[ "$first" == .* && "$first" != ".DS_Store" ]] || [[ "$rel" == "Library/Application Support/"* ]]; }; then
           printf '%s\n' "$rel"
         fi
       done | sort -u

@@ -84,6 +84,24 @@ alias ls='ls -G'
 autoload -Uz bracketed-paste-magic
 zle -N bracketed-paste bracketed-paste-magic
 
+# vim-with-a-hat: Ghostty's cmd+shift+e / cmd+shift+b paste a temp screen/scrollback
+# dump path plus a newline as plain keystrokes, which submits the line. Intercept
+# accept-line: if the line is exactly such a dump path, open it in `vh` (its own
+# window) instead of executing it. Every other command runs normally.
+_vh_accept_line() {
+  emulate -L zsh
+  setopt extendedglob
+  local p=${BUFFER//[$'\r\n']/}
+  p=${p##[[:space:]]#}; p=${p%%[[:space:]]#}
+  if [[ -f $p && ${p:t} == (screen|scrollback).txt ]] \
+     && [[ $p == ${TMPDIR}* || $p == /private/var/folders/* || $p == /tmp/* ]]; then
+    vh "$p" >/dev/null 2>&1 &!
+    BUFFER=
+  fi
+  zle .accept-line
+}
+zle -N accept-line _vh_accept_line
+
 # gets the current branch from git
 function git_current_branch() {
   local ref
