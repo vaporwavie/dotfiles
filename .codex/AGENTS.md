@@ -22,6 +22,13 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - Install obvious, well-known dependencies when the need is clear. Ask before adding anything heavyweight, niche, security-sensitive, or likely to bloat the lockfile.
 - Use English for code, comments, docs, examples, commits, configs, error messages, and tests.
 
+## Verification
+
+- agent-browser is the ONLY browser automation tool. Use it for all programmatic browser work — both while developing/iterating and for final verification. Never use Playwright, Puppeteer, or any other browser-driver library for this.
+- It is one continuous loop, not two passes: do not drive dev with one browser tool and then re-verify with another. That duplicates the whole flow and burns tokens.
+- After every change, confirm UI/UX in agent-browser and fix any issues. Do not stop until all changes have been verified.
+- When using agent-browser, always close sessions with `agent-browser close --all` when done. If you started any dev server for verification, record its PID and kill it before finalizing; also check for leftover fallback-port dev servers you may have started.
+
 ## Tooling
 
 - Files: `fd`
