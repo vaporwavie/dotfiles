@@ -17,6 +17,8 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - My main stack is TypeScript, JavaScript, Node, and Swift. Otherwise, match the repo.
 - Verify before claiming absence or breakage: follow imports and adjacent code enough to support the claim.
 - Default to no comments. Add comments only for subtle invariants or non-obvious constraints.
+- Never write decorative or redundant comments: no section-banner/divider comments (e.g. `// --- The overlay ---`), no comments that just restate the code or label an obvious block. They are harmful noise. If a comment doesn't carry information the code can't, omit it.
+- Don't overexplain. When a comment is warranted, keep it lean: one short line on the why, not a narration of the code or a multi-line essay.
 - New functionality should include tests. Bug fixes should include regression tests when practical. If a change is too small for tests, say so.
 - Install obvious, well-known dependencies when the need is clear. Ask before adding anything heavyweight, niche, security-sensitive, or likely to bloat the lockfile.
 - Use English for code, comments, docs, examples, commits, configs, error messages, and tests.
@@ -46,5 +48,31 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 
 ## Git And PRs
 
+When writing a PR focus on two possible outcomes. Check `.github/pull_request_template.md`.
+
+If it exists:
+
+-  Write `pr.md` using that template; if not, ask how to structure it. Keep PR copy product-facing by default: behavior, workflow impact, business reason, verification, and reviewer-relevant risk. Create the PR. Delete `pr.md` afterwards.
+
+
+If it does not:
+
+Use this template:
+
+```
+you can grab the branch name that *should* be the task id. If that's the case, write here "Closes [taskId]"
+
+## What
+product explained
+
+## Why
+what it aims
+
+## How
+how it is done
+````
+
+Notes:
+
 - Commit only when asked. Use `<type>(<scope>): <subject>`, with type `feat|fix|docs|style|refactor|test|chore|perf`, subject <= 50 chars, imperative mood, and no trailing period.
-- For PR messages, check `.github/pull_request_template.md`. If it exists, write `pr.md` using that template; if not, ask how to structure it. Keep PR copy product-facing by default: behavior, workflow impact, business reason, verification, and reviewer-relevant risk.
+- Never hard-wrap prose in PR/issue bodies and comments. GitHub renders single newlines there as `<br>`, so column-wrapped paragraphs come out as choppy mid-sentence breaks. Put each paragraph and list item on one line and let it soft-wrap. Hard breaks still belong in tables (one row per line) and code/mermaid fences.

@@ -21,7 +21,7 @@
     ],
     "defaultMode": "bypassPermissions"
   },
-  "model": "claude-fable-5[1m]",
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -65,28 +65,26 @@
     "command": "sh \"$HOME/.claude/statusline.sh\""
   },
   "enabledPlugins": {
-    "context7@claude-plugins-official": false,
-    "frontend-design@claude-plugins-official": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
-    "swift-lsp@claude-plugins-official": true,
+    "context7@claude-plugins-official": true,
     "vercel@claude-plugins-official": true,
-    "paper-desktop@paper": true
+    "frontend-design@claude-plugins-official": true,
+    "honcho@honcho": true
   },
   "extraKnownMarketplaces": {
-    "paper": {
+    "honcho": {
       "source": {
         "source": "github",
-        "repo": "paper-design/agent-plugins"
+        "repo": "plastic-labs/claude-honcho"
       }
     }
   },
   "effortLevel": "xhigh",
-  "fastMode": true,
   "promptSuggestionEnabled": false,
   "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
+  "verbose": true,
+  "switchModelsOnFlag": false,
   "terminalProgressBarEnabled": false,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true,
-  "inputNeededNotifEnabled": false
+  "skipAutoPermissionPrompt": true
 }

@@ -17,6 +17,7 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - My main stack is TypeScript, JavaScript, Node, and Swift. Otherwise, match the repo.
 - Verify before claiming absence or breakage: follow imports and adjacent code enough to support the claim.
 - Default to no comments. Add comments only for subtle invariants or non-obvious constraints.
+- Don't overexplain. When a comment is warranted, keep it lean: one short line on the why, not a narration of the code or a multi-line essay.
 - New functionality should include tests. Bug fixes should include regression tests when practical. If a change is too small for tests, say so.
 - Install obvious, well-known dependencies when the need is clear. Ask before adding anything heavyweight, niche, security-sensitive, or likely to bloat the lockfile.
 - Use English for code, comments, docs, examples, commits, configs, error messages, and tests.

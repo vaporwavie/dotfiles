@@ -11,8 +11,9 @@ usage() {
   cat <<'EOF'
 Usage: ./bootstrap.sh [--dry-run]
 
-Copy tracked dotfiles from this repo into TARGET_ROOT (default: $HOME).
-Existing targets are backed up to BACKUP_ROOT before being replaced.
+Symlink tracked dotfiles from this repo into TARGET_ROOT (default: $HOME).
+Each target becomes a symlink back into the repo, so edits on either side stay
+in sync. Existing real files are backed up to BACKUP_ROOT before being replaced.
 
 Examples:
   ./bootstrap.sh
@@ -71,20 +72,10 @@ paths_differ() {
   local src="$1"
   local dest="$2"
 
-  if [[ ! -e "$dest" && ! -L "$dest" ]]; then
-    return 0
+  # Up to date only when dest is already a symlink pointing at src.
+  if [[ -L "$dest" && "$(readlink "$dest")" == "$src" ]]; then
+    return 1
   fi
-
-  if [[ -d "$src" && -d "$dest" ]]; then
-    ! diff -qr "$src" "$dest" >/dev/null 2>&1
-    return
-  fi
-
-  if [[ -f "$src" && -f "$dest" ]]; then
-    ! cmp -s "$src" "$dest"
-    return
-  fi
-
   return 0
 }
 
@@ -103,7 +94,7 @@ install_path() {
 
   mkdir -p "$(dirname -- "$dest")"
   rm -rf "$dest"
-  cp -PR "$src" "$dest"
+  ln -s "$src" "$dest"
 }
 
 paths="$(list_paths)"
@@ -117,7 +108,7 @@ backed_up=0
 installed=0
 skipped=0
 
-echo "Installing dotfiles into $target_root"
+echo "Linking dotfiles into $target_root"
 
 while IFS= read -r rel_path; do
   [[ -n "$rel_path" ]] || continue
@@ -131,7 +122,7 @@ while IFS= read -r rel_path; do
   fi
 
   if ! paths_differ "$src" "$dest"; then
-    echo "skip    $rel_path (already up to date)"
+    echo "skip    $rel_path (already linked)"
     skipped=$((skipped + 1))
     continue
   fi
@@ -144,7 +135,7 @@ while IFS= read -r rel_path; do
     backed_up=$((backed_up + 1))
   fi
 
-  echo "install $rel_path -> $dest"
+  echo "link    $rel_path -> $dest"
   if [[ "$dry_run" -eq 0 ]]; then
     install_path "$src" "$dest"
   fi
@@ -154,7 +145,7 @@ $paths
 EOF
 
 if [[ "$dry_run" -eq 1 ]]; then
-  echo "Dry run complete: $installed install(s), $backed_up backup(s), $skipped skipped."
+  echo "Dry run complete: $installed link(s), $backed_up backup(s), $skipped skipped."
   exit 0
 fi
 
@@ -162,4 +153,4 @@ if [[ "$backed_up" -gt 0 ]]; then
   echo "Backups saved in $backup_root"
 fi
 
-echo "Done: $installed install(s), $backed_up backup(s), $skipped skipped."
+echo "Done: $installed link(s), $backed_up backup(s), $skipped skipped."
