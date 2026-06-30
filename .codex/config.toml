@@ -81,7 +81,7 @@ enabled = true
 enabled = true
 
 [plugins."vercel@claude-plugins-official"]
-enabled = true
+enabled = false
 
 [plugins."linear@openai-curated"]
 enabled = true
@@ -103,8 +103,8 @@ source_type = "local"
 source = "/Users/router/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [marketplaces.claude-plugins-official]
-last_updated = "2026-06-12T13:53:48Z"
-last_revision = "df202fe49d81404902cf785b64c1c5f9cc0b0315"
+last_updated = "2026-06-30T17:07:32Z"
+last_revision = "7d0e5f5aae1643db011e905b561fca81776388a6"
 source_type = "git"
 source = "https://github.com/anthropics/claude-plugins-official.git"
 
@@ -263,6 +263,9 @@ trust_level = "trusted"
 [projects."/Users/router/Workspace/dotfiles"]
 trust_level = "trusted"
 
+[projects."/Users/luiznickel"]
+trust_level = "trusted"
+
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_create_pull_request]
 approval_mode = "approve"
 
@@ -270,15 +273,6 @@ approval_mode = "approve"
 approval_mode = "approve"
 
 [hooks.state]
-
-[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:0"]
-trusted_hash = "sha256:3854f8501763b92012b4def8de676279493adfbaec8cc1d00ce72b8e80341b1c"
-
-[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:1"]
-trusted_hash = "sha256:34d8e6e4abd36e2448fe0032fd7a20e075b3c985eea7290379689add51264a03"
-
-[hooks.state."vercel@claude-plugins-official:hooks/hooks.json:session_start:0:2"]
-trusted_hash = "sha256:2ebad29288ff7fb558b111a94eea88404fdd80f7739be1bea8098ddea09b31d0"
 
 [desktop]
 ambient-suggestions-enabled = false
