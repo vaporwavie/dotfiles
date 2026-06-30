@@ -21,6 +21,7 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - New functionality should include tests. Bug fixes should include regression tests when practical. If a change is too small for tests, say so.
 - Install obvious, well-known dependencies when the need is clear. Ask before adding anything heavyweight, niche, security-sensitive, or likely to bloat the lockfile.
 - Use English for code, comments, docs, examples, commits, configs, error messages, and tests.
+- On code comments: Please make the comments concise and timeless. Avoid tombstone-like comment saying thing was removed
 
 ## Verification
 
