@@ -1,3 +1,0 @@
-#!/bin/sh
-cd /Users/router/.codex/tools/just-bash || exit 1
-exec /Users/router/.amp/bin/bun run jb -- "$@"

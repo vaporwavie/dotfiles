@@ -1,12 +1,9 @@
 *
 !.gitignore
 !README.md
+!CLAUDE.md
 !settings.json
 !statusline.sh
-!hooks/
-hooks/*
-!hooks/block-playwright.sh
-!hooks/verify-browser-reminder.sh
 !skills/
 skills/*
 !skills/frontend-design/

@@ -6,18 +6,34 @@ target_root="${TARGET_ROOT:-$HOME}"
 timestamp="$(date +%Y%m%d-%H%M%S)"
 backup_root="${BACKUP_ROOT:-$target_root/.dotfiles-backup/$timestamp}"
 dry_run=0
+install_tools=1
+
+# Agent CLIs installed from their upstream npm packages rather than vendored in
+# this repo. Keep these as bare npm package names.
+npm_global_tools=(
+  agent-browser
+  just-bash
+)
 
 usage() {
   cat <<'EOF'
-Usage: ./bootstrap.sh [--dry-run]
+Usage: ./bootstrap.sh [--dry-run] [--no-tools]
 
 Symlink tracked dotfiles from this repo into TARGET_ROOT (default: $HOME).
 Each target becomes a symlink back into the repo, so edits on either side stay
 in sync. Existing real files are backed up to BACKUP_ROOT before being replaced.
 
+Also installs the agent CLIs (agent-browser, just-bash) from their upstream npm
+packages, so the repo never vendors a copy of them.
+
+Options:
+  -n, --dry-run   Preview changes without writing anything
+      --no-tools  Skip installing the agent CLIs from npm
+
 Examples:
   ./bootstrap.sh
   ./bootstrap.sh --dry-run
+  ./bootstrap.sh --no-tools
   TARGET_ROOT=/tmp/test-home ./bootstrap.sh
 EOF
 }
@@ -26,6 +42,9 @@ while [[ $# -gt 0 ]]; do
   case "$1" in
     -n|--dry-run)
       dry_run=1
+      ;;
+    --no-tools)
+      install_tools=0
       ;;
     -h|--help)
       usage
@@ -97,6 +116,30 @@ install_path() {
   ln -s "$src" "$dest"
 }
 
+ensure_npm_tools() {
+  [[ "$install_tools" -eq 1 ]] || return 0
+  [[ ${#npm_global_tools[@]} -gt 0 ]] || return 0
+
+  echo "Ensuring agent CLIs from npm"
+
+  if ! command -v npm >/dev/null 2>&1; then
+    echo "warn    npm not found; skipping $(IFS=', '; echo "${npm_global_tools[*]}")" >&2
+    return 0
+  fi
+
+  local pkg
+  for pkg in "${npm_global_tools[@]}"; do
+    if command -v "$pkg" >/dev/null 2>&1; then
+      echo "skip    $pkg (already installed)"
+      continue
+    fi
+    echo "install $pkg (npm install -g)"
+    if [[ "$dry_run" -eq 0 ]]; then
+      npm install -g "$pkg"
+    fi
+  done
+}
+
 paths="$(list_paths)"
 
 if [[ -z "$paths" ]]; then
@@ -143,6 +186,8 @@ while IFS= read -r rel_path; do
 done <<EOF
 $paths
 EOF
+
+ensure_npm_tools
 
 if [[ "$dry_run" -eq 1 ]]; then
   echo "Dry run complete: $installed link(s), $backed_up backup(s), $skipped skipped."

@@ -29,7 +29,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.claude/hooks/block-playwright.sh\"",
+            "command": "\"$HOME/.harness/hooks/block-playwright.sh\"",
             "timeout": 10,
             "statusMessage": "Checking for Playwright (use agent-browser)…"
           }
@@ -52,7 +52,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$HOME/.claude/hooks/verify-browser-reminder.sh\"",
+            "command": "\"$HOME/.harness/hooks/verify-browser-reminder.sh\"",
             "timeout": 15,
             "statusMessage": "Checking UI changes were browser-verified…"
           }

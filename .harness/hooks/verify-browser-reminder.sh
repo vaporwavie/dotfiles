@@ -20,12 +20,16 @@ ui_edited="$(jq -r '
 ' "$transcript" 2>/dev/null | grep -iE '\.(tsx|jsx|vue|svelte|css|scss|less|html)$' | head -1 || true)"
 [[ -n "$ui_edited" ]] || exit 0
 
+# Count any browser verification: the agent-browser CLI (in Bash commands) or
+# the Claude_Preview MCP tools (by tool name). grep -c already prints 0 and exits
+# non-zero on no match, so swallow the exit with `|| true` — NOT `|| echo 0`,
+# which would emit a second line and break the numeric test below.
 used_browser="$(jq -r '
   .. | objects
   | select(.type? == "tool_use")
-  | select(.name? == "Bash")
-  | (.input.command // empty)
-' "$transcript" 2>/dev/null | grep -c 'agent-browser' || echo 0)"
+  | (.input.command? // "") + " " + (.name? // "")
+' "$transcript" 2>/dev/null | grep -ciE 'agent-browser|mcp__Claude_Preview__' || true)"
+used_browser="$(printf '%s' "$used_browser" | tail -n1 | tr -dc '0-9')"
 [[ "${used_browser:-0}" -gt 0 ]] && exit 0
 
 echo "UI files were edited but agent-browser was never used to verify them. Per the Verification rules, confirm the UI/UX in agent-browser (then 'agent-browser close --all') before stopping." >&2
