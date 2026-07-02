@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Model Delegation — Assessment &amp; Implementation Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #060708;
+    --surface: #0c0e10;
+    --surface-2: #111417;
+    --line: #1e2328;
+    --line-strong: #2c333a;
+    --ink: #e8eaec;
+    --ink-dim: #9aa3ab;
+    --ink-faint: #5c656d;
+    --accent: #2e8fe6;
+    --accent-deep: #0169cc;
+    --ok: #00a240;
+    --ok-bright: #1fc763;
+    --bad: #e02e2a;
+    --bad-bright: #ff5b52;
+    --warn: #d99a1b;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", SFMono-Regular, Menlo, monospace;
+    --display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(1200px 500px at 75% -10%, rgba(1,105,204,.10), transparent 60%),
+      radial-gradient(800px 400px at 10% 110%, rgba(0,162,64,.05), transparent 60%);
+  }
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    background-image: repeating-linear-gradient(0deg, rgba(255,255,255,.014) 0 1px, transparent 1px 3px);
+    z-index: 3;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 0 28px 120px; }
+
+  header.masthead {
+    padding: 64px 0 40px;
+    border-bottom: 1px solid var(--line-strong);
+    animation: rise .7s ease both;
+  }
+  .kicker {
+    display: flex; gap: 14px; flex-wrap: wrap; align-items: baseline;
+    color: var(--ink-faint); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase;
+  }
+  .kicker .dot { color: var(--accent); }
+  h1 {
+    font-family: var(--display);
+    font-weight: 560;
+    font-size: clamp(44px, 7.5vw, 84px);
+    line-height: .98;
+    letter-spacing: -.015em;
+    margin: 22px 0 18px;
+  }
+  h1 em { font-style: italic; color: var(--accent); font-weight: 480; }
+  .standfirst {
+    max-width: 62ch; color: var(--ink-dim); font-size: 14.5px;
+  }
+  .standfirst b { color: var(--ink); font-weight: 600; }
+
+  .tldr {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px;
+    background: var(--line); border: 1px solid var(--line); margin: 44px 0 0;
+    animation: rise .7s .08s ease both;
+  }
+  .tldr > div { background: var(--surface); padding: 18px 20px; }
+  .tldr .n { font-family: var(--display); font-size: 30px; font-weight: 550; line-height: 1.1; }
+  .tldr .n.ok { color: var(--ok-bright); }
+  .tldr .n.bad { color: var(--bad-bright); }
+  .tldr .n.ac { color: var(--accent); }
+  .tldr p { color: var(--ink-dim); font-size: 12px; margin-top: 6px; }
+
+  section { margin-top: 72px; animation: rise .6s ease both; }
+  .sec-head { display: flex; align-items: baseline; gap: 18px; border-bottom: 1px solid var(--line-strong); padding-bottom: 12px; margin-bottom: 26px; }
+  .sec-head .num {
+    font-family: var(--display); font-style: italic; font-weight: 460;
+    font-size: 34px; color: var(--accent); min-width: 58px;
+  }
+  .sec-head h2 { font-size: 15px; letter-spacing: .16em; text-transform: uppercase; font-weight: 600; }
+  section > p, section > ul { max-width: 74ch; color: var(--ink-dim); }
+  section > p + p { margin-top: 14px; }
+  section b, section strong { color: var(--ink); }
+  code {
+    background: var(--surface-2); border: 1px solid var(--line);
+    padding: .1em .4em; border-radius: 3px; font-size: .92em; color: #bfd9f2;
+    font-family: var(--mono);
+  }
+
+  table { width: 100%; border-collapse: collapse; margin: 22px 0 8px; font-size: 13px; }
+  th {
+    text-align: left; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 600; padding: 10px 14px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-dim); }
+  td:first-child { color: var(--ink); white-space: nowrap; }
+  tr:hover td { background: rgba(46,143,230,.035); }
+  .num-cell { font-variant-numeric: tabular-nums; }
+
+  .status { display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; font-size: 12px; }
+  .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+  .status.ok { color: var(--ok-bright); }
+  .status.bad { color: var(--bad-bright); }
+  .status.warn { color: var(--warn); }
+
+  .term {
+    background: var(--surface); border: 1px solid var(--line-strong);
+    border-radius: 6px; margin: 22px 0; overflow: hidden;
+  }
+  .term .bar {
+    display: flex; align-items: center; gap: 8px;
+    padding: 9px 14px; border-bottom: 1px solid var(--line);
+    color: var(--ink-faint); font-size: 11px; letter-spacing: .1em;
+  }
+  .term .bar::before { content: "❯"; color: var(--accent); }
+  .term pre {
+    padding: 16px 18px; overflow-x: auto; font-size: 12.5px; line-height: 1.75;
+    font-family: var(--mono); color: var(--ink-dim);
+  }
+  .term pre .c { color: var(--ink-faint); }
+  .term pre .g { color: var(--ok-bright); }
+  .term pre .r { color: var(--bad-bright); }
+  .term pre .b { color: #6db3f2; }
+  .term pre .y { color: var(--warn); }
+
+  .rule-card {
+    border-left: 2px solid var(--accent-deep); background: linear-gradient(90deg, rgba(1,105,204,.06), transparent 55%);
+    padding: 14px 18px; margin: 14px 0; max-width: 78ch;
+  }
+  .rule-card .t { color: var(--ink); font-weight: 600; font-size: 13px; }
+  .rule-card p { color: var(--ink-dim); font-size: 12.5px; margin-top: 4px; }
+
+  .chain {
+    display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    margin: 20px 0; font-size: 12.5px;
+  }
+  .chain span.node { background: var(--surface-2); border: 1px solid var(--line-strong); padding: 6px 12px; border-radius: 4px; color: #bfd9f2; }
+  .chain span.arrow { color: var(--ink-faint); }
+
+  footer {
+    margin-top: 90px; padding-top: 24px; border-top: 1px solid var(--line-strong);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    color: var(--ink-faint); font-size: 11.5px; letter-spacing: .08em;
+  }
+  @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (max-width: 720px) {
+    .tldr { grid-template-columns: 1fr; }
+    td:first-child { white-space: normal; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <div class="kicker">
+    <span>harness report</span><span class="dot">●</span>
+    <span>~/.harness/AGENTS.md</span><span class="dot">●</span>
+    <span>2026-07-01</span>
+  </div>
+  <h1>Model <em>Delegation</em></h1>
+  <p class="standfirst">Assessment and implementation of a cross-model orchestration policy: <b>Fable orchestrates, cheaper models execute and report back</b>. Adapted from a published CLAUDE.md approach (rank models on cost / intelligence / taste, route bulk and token-hungry work to gpt-5.5 via the Codex CLI), verified end-to-end against this machine, and installed as a new <b>Model Delegation</b> section in the canonical ruleset.</p>
+
+  <div class="tldr">
+    <div>
+      <div class="n ok">3.9s</div>
+      <p>gpt-5.5 round-trip via <code>codex exec</code>, once two invocation bugs were fixed. Works sandboxed and unsandboxed.</p>
+    </div>
+    <div>
+      <div class="n ac">+28 lines</div>
+      <p>New "Model Delegation" section in AGENTS.md: ranking table, routing rules, verified mechanics.</p>
+    </div>
+    <div>
+      <div class="n bad">2 dead paths</div>
+      <p>Fireworks profile has no provider definition; Baseten key never migrated from the old <code>router</code> account.</p>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="sec-head"><span class="num">01</span><h2>The source approach</h2></div>
+  <p>The source is a "Picking the right models for workflows and subagents" section from another engineer's CLAUDE.md. Its core moves:</p>
+  <div class="rule-card"><span class="t">Rank every reachable model on three axes</span><p>cost (what you actually pay, not list price), intelligence (how hard a problem it takes unsupervised), taste (UI/UX, code quality, API design, copy). gpt-5.5 scores 9/8/5 — nearly free and smart, mediocre taste.</p></div>
+  <div class="rule-card"><span class="t">Defaults, not limits — standing permission to escalate</span><p>If a cheaper model's output misses the bar, rerun with a smarter one without asking. Judge output, not price tag. For anything that ships: intelligence &gt; taste &gt; cost.</p></div>
+  <div class="rule-card"><span class="t">Route by shape of work</span><p>Bulk/mechanical → gpt-5.5. User-facing → taste ≥ 7. Reviews → Fable/Opus plus optionally gpt-5.5 as an independent perspective. Token-hungry work (computer use, codebase analysis) never runs in the orchestrator's own context — delegate, report back.</p></div>
+  <div class="rule-card"><span class="t">Reach gpt-5.5 through the Codex CLI</span><p><code>codex exec</code> / <code>codex exec review</code>; inside workflows (whose model param only takes Claude models) a thin Sonnet wrapper agent writes a self-contained codex prompt, runs it via Bash, returns the last message.</p></div>
+  <p>The author's claimed outcome: PR discard rate went from roughly 50% to zero once orchestration and execution were split across models this way.</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">02</span><h2>Assessment against this machine</h2></div>
+  <p>Every claim was checked against what is actually installed and authenticated here before writing anything into the ruleset.</p>
+  <table>
+    <thead><tr><th>source element</th><th>local reality</th><th>status</th></tr></thead>
+    <tbody>
+      <tr><td>gpt-5.5 via <code>codex exec</code></td><td>codex-cli 0.142.5 at <code>~/.local/bin/codex</code>; <code>~/.codex/config.toml</code> defaults to gpt-5.5, medium reasoning, fast service tier, ChatGPT auth.</td><td><span class="status ok">verified</span></td></tr>
+      <tr><td>codex-implementation / -review / -computer-use skills</td><td>Don't exist here. Not needed — mechanics are small enough to inline in AGENTS.md, which every agent reads.</td><td><span class="status warn">inlined instead</span></td></tr>
+      <tr><td>Open-model fallback (Kimi/GLM)</td><td>Fireworks profile references a <code>fireworks</code> provider that is defined nowhere, and no Fireworks API key exists in the keychain — <code>cx fw</code> is currently broken too, likely since a codex update. Baseten GLM-5.2 profile is intact but its keychain item (<code>codex-baseten-api-key</code>) was never migrated from the old <code>router</code> user account.</td><td><span class="status bad">both dead</span></td></tr>
+      <tr><td>"Never use Haiku"</td><td>Kept, with the local rationale: gpt-5.5 and glm-5.2 are cheaper <em>and</em> smarter, so Haiku has no niche.</td><td><span class="status ok">adopted</span></td></tr>
+      <tr><td>Codex for computer use / UI verification</td><td>Collides with the existing hard rule that <b>agent-browser is the only browser tool</b>. Reconciled: delegation is allowed, but the codex prompt must instruct it to use agent-browser and close sessions — never its own browser plugins.</td><td><span class="status warn">adapted</span></td></tr>
+      <tr><td>Claude models via Agent/Workflow <code>model</code> param</td><td>Confirmed: the param accepts sonnet / opus / haiku / fable only, which is exactly why the wrapper pattern is needed for gpt-5.5.</td><td><span class="status ok">verified</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">03</span><h2>What was implemented</h2></div>
+  <p>A <b>Model Delegation</b> section now sits between Tooling and Artifacts in the canonical ruleset, so Codex, Claude Code, and any future agent all inherit it through the same symlink chain:</p>
+  <div class="chain">
+    <span class="node">~/.claude/CLAUDE.md</span><span class="arrow">→ @includes →</span>
+    <span class="node">~/.harness/AGENTS.md</span><span class="arrow">→ symlink →</span>
+    <span class="node">~/Workspace/dotfiles/.harness/AGENTS.md</span>
+  </div>
+  <p>The ranking table, adjusted to what is reachable on this machine today:</p>
+  <table>
+    <thead><tr><th>model</th><th class="num-cell">cost</th><th class="num-cell">intelligence</th><th class="num-cell">taste</th><th>reach via</th></tr></thead>
+    <tbody>
+      <tr><td>gpt-5.5</td><td class="num-cell">9</td><td class="num-cell">8</td><td class="num-cell">5</td><td><code>codex exec</code> (config default)</td></tr>
+      <tr><td>glm-5.2</td><td class="num-cell">9</td><td class="num-cell">6</td><td class="num-cell">4</td><td><code>codex exec -p baseten-glm</code> — once the keychain item is restored</td></tr>
+      <tr><td>sonnet-5</td><td class="num-cell">5</td><td class="num-cell">5</td><td class="num-cell">7</td><td>Agent/Workflow <code>model</code> param</td></tr>
+      <tr><td>opus-4.8</td><td class="num-cell">4</td><td class="num-cell">7</td><td class="num-cell">8</td><td>Agent/Workflow <code>model</code> param</td></tr>
+      <tr><td>fable-5</td><td class="num-cell">2</td><td class="num-cell">9</td><td class="num-cell">9</td><td>main session, or <code>model</code> param</td></tr>
+    </tbody>
+  </table>
+  <p>Routing rules follow the source closely (escalate freely; intelligence &gt; taste &gt; cost for anything that ships; bulk work → gpt-5.5; taste ≥ 7 for user-facing; reviews → fable/opus with optional <code>codex exec review</code> second opinion; token-hungry work is delegated and reported back, never run in the orchestrator's context). The mechanics block encodes the <em>verified</em> invocation — including two gotchas discovered during testing that the source never mentions.</p>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">04</span><h2>Verification evidence</h2></div>
+  <p>Naive invocation hangs forever. The JSONL event stream (<code>--json</code>) exposed both causes:</p>
+  <div class="term">
+    <div class="bar">codex exec --json &nbsp;·&nbsp; stall diagnosis</div>
+    <pre><span class="y">Reading additional input from stdin...</span>          <span class="c"># blocks until stdin EOF → redirect &lt;/dev/null</span>
+<span class="r">Not inside a trusted directory and --skip-git-repo-check was not specified.</span></pre>
+  </div>
+  <table>
+    <thead><tr><th>test</th><th>result</th><th>status</th></tr></thead>
+    <tbody>
+      <tr><td><code>codex exec</code>, naive (piped stdin)</td><td>Hangs indefinitely reading stdin; killed after minutes. Affects sandboxed and unsandboxed shells equally.</td><td><span class="status bad">hang → diagnosed</span></td></tr>
+      <tr><td><code>codex exec</code> with <code>&lt;/dev/null --skip-git-repo-check</code></td><td>"DELEGATION_OK GPT-5" in <b>3.9s</b>, 14.5k tokens.</td><td><span class="status ok">pass</span></td></tr>
+      <tr><td>Same, inside the Claude Code Bash sandbox</td><td>"SANDBOXED_OK" in <b>7.9s</b>, 16.5k tokens — no permission escalation needed for delegation.</td><td><span class="status ok">pass</span></td></tr>
+      <tr><td>Wrapper-agent pattern (Sonnet → Bash → codex → report)</td><td>Thin Sonnet wrapper spawned via the Agent tool ran <code>codex exec -C ~/Workspace/dotfiles</code> and returned the report verbatim: <b>MD_COUNT=1</b> in 13.4s end-to-end. (codex skipped hidden dirs when counting — a live demo of why delegated prompts need precise acceptance criteria.)</td><td><span class="status ok">pass</span></td></tr>
+      <tr><td><code>codex exec -p fireworks</code></td><td><span class="r">Error: Model provider `fireworks` not found</span> — no provider block anywhere in <code>~/.codex</code>, no keychain key.</td><td><span class="status bad">fail</span></td></tr>
+      <tr><td><code>codex exec -p baseten-glm</code></td><td>Provider and profile resolve, but auth fails: <code>codex-baseten-api-key</code> absent from the login keychain (checked both <code>luiznickel</code> and legacy <code>router</code> accounts).</td><td><span class="status bad">fail — key missing</span></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="sec-head"><span class="num">05</span><h2>Gaps &amp; tuning knobs</h2></div>
+  <p><b>To restore the GLM path</b> (near-free open-model fallback), re-add the key once:</p>
+  <div class="term">
+    <div class="bar">one-time fix</div>
+    <pre>security add-generic-password -a luiznickel -s codex-baseten-api-key -w <span class="b">'&lt;BASETEN_API_KEY&gt;'</span></pre>
+  </div>
+  <p><b>Fireworks</b> is doubly dead (no provider definition, no key). Either define <code>[model_providers.fireworks]</code> in <code>config.toml</code> with a keychain-backed auth command like Baseten's, or delete <code>fireworks.config.toml</code>, its catalog, and the <code>fw</code> branch of the <code>cx</code> wrapper to stop advertising a path that errors.</p>
+  <p><b>Scores are opinions.</b> The table numbers are seeded from the source plus local judgment; tune them as experience accumulates — they're defaults the rules already grant permission to override.</p>
+  <p><b>Reasoning effort per delegation.</b> The config default is medium; for hard delegated problems add <code>-c model_reasoning_effort=high</code> (or xhigh) to a single <code>codex exec</code> call instead of editing config.</p>
+  <p><b>Ephemeral by default.</b> <code>--ephemeral</code> keeps delegated one-shots out of <code>~/.codex/sessions</code>; drop it when you want <code>codex exec resume</code> to be able to continue the delegated thread.</p>
+</section>
+
+<footer>
+  <span>model-delegation · assessment &amp; implementation report</span>
+  <span>dotfiles/.harness/writeups · generated 2026-07-01</span>
+</footer>
+
+</div>
+</body>
+</html>

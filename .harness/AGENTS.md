@@ -44,6 +44,36 @@ Do not add generic model-behavior steering, reasoning-process prompts, model-spe
 - Shell affordance tests: `just-bash` (https://github.com/vercel-labs/just-bash)
 - Node tooling in non-interactive zsh comes from `~/.local/bin/fnm-node-shim`, symlinked as `node`, `npm`, `npx`, `corepack`, `pnpm`, `pnpx`, `yarn`, and `yarnpkg`. If `pnpm` is missing, verify `~/.local/bin` precedes Homebrew in `.zprofile` and check `corepack install -g pnpm@10.31.0`.
 
+## Model Delegation
+
+When orchestrating subagents/workflows or handing off work, pick models by these rankings (higher = better). Cost reflects what I actually pay, not list price. Intelligence is how hard a problem the model can take unsupervised. Taste covers UI/UX, code quality, API design, and copy.
+
+| model | cost | intelligence | taste | reach via |
+|---|---|---|---|---|
+| gpt-5.5 | 9 | 8 | 5 | `codex exec` (my `~/.codex/config.toml` default) |
+| glm-5.2 | 9 | 6 | 4 | `codex exec -p baseten-glm` (needs `codex-baseten-api-key` in login keychain) |
+| sonnet-5 | 5 | 5 | 7 | Agent/Workflow `model` param |
+| opus-4.8 | 4 | 7 | 8 | Agent/Workflow `model` param |
+| fable-5 | 2 | 9 | 9 | main session, or `model` param |
+
+How to apply:
+
+- These are defaults, not limits. Standing permission to override: if a cheaper model's output doesn't meet the bar, rerun or redo the work with a smarter model without asking. Judge the output, not the price tag; escalating costs less than shipping mediocre work.
+- Cost is a tie-breaker only; when axes conflict for anything that ships, intelligence > taste > cost.
+- Bulk/mechanical work (clear-spec implementation, migrations, data analysis, codebase sweeps): gpt-5.5.
+- Token-hungry work (computer use, whole-codebase analysis, long log digs) must not run in the orchestrator's own context: delegate it and have only the result reported back.
+- Anything user-facing (UI, copy, API design) needs taste ≥ 7.
+- Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 (`codex exec review`) as an extra independent perspective.
+- Don't use Haiku; gpt-5.5 and glm-5.2 are cheaper and smarter.
+
+Mechanics:
+
+- Codex shares no conversation context, so every delegated prompt must be self-contained: working dir (`-C <dir>`), spec, constraints, acceptance criteria, and the exact shape of the report to return.
+- Headless calls must redirect stdin (`</dev/null`) — codex otherwise blocks reading piped input forever — and need `-C <git repo>` or `--skip-git-repo-check` when outside a trusted directory.
+- Investigation/analysis: `codex exec -s read-only "<prompt>"`. Implementation: `codex exec -s workspace-write "<prompt>"`. Reviews: `codex exec review`. Add `-o <file>` to capture the final message cleanly, `--output-schema <file>` for structured JSON.
+- The Agent/Workflow `model` param only takes Claude models. To use gpt-5.5 inside a workflow, spawn a thin wrapper agent (`model: 'sonnet'`, low effort) whose prompt writes the self-contained codex prompt, runs `codex exec` via Bash, and returns the last message verbatim.
+- Delegated UI/UX work still obeys Verification: the codex prompt must tell it to use `agent-browser` (never its own browser plugins) and close sessions when done.
+
 ## Artifacts
 
 - For substantial plans, design explorations, reports, reviews, or interactive throwaway tools, write one self-contained HTML file by default.
