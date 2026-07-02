@@ -1,4 +1,4 @@
-model = "zai-org/GLM-5.2"
+model = "gpt-5.5"
 model_catalog_json = "/Users/luiznickel/.codex/model-catalogs/codex-app-custom.json"
 model_context_window = 1050000
 model_auto_compact_token_limit = 900000
