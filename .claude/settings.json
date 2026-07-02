@@ -67,16 +67,7 @@
   "enabledPlugins": {
     "context7@claude-plugins-official": true,
     "vercel@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
-    "honcho@honcho": true
-  },
-  "extraKnownMarketplaces": {
-    "honcho": {
-      "source": {
-        "source": "github",
-        "repo": "plastic-labs/claude-honcho"
-      }
-    }
+    "frontend-design@claude-plugins-official": true
   },
   "effortLevel": "xhigh",
   "promptSuggestionEnabled": false,
