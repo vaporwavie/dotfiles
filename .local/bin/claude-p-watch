@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -u
 
-claude_bin="${CLAUDE_P_BIN:-/Users/router/.local/bin/claude}"
+claude_bin="${CLAUDE_P_BIN:-$HOME/.local/bin/claude}"
 interval="${CLAUDE_P_HEARTBEAT_SECONDS:-10}"
 stream="${CLAUDE_P_HEARTBEAT_STREAM:-stderr}"
 
