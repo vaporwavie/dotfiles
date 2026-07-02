@@ -51,7 +51,7 @@ When orchestrating subagents/workflows or handing off work, pick models by these
 | model | cost | intelligence | taste | reach via |
 |---|---|---|---|---|
 | gpt-5.5 | 9 | 8 | 5 | `codex exec` (my `~/.codex/config.toml` default) |
-| glm-5.2 | 9 | 6 | 4 | `codex exec -p baseten-glm` (needs `codex-baseten-api-key` in login keychain) |
+| glm-5.2 | 9 | 6 | 4 | `codex exec -p baseten-glm` |
 | sonnet-5 | 5 | 5 | 7 | Agent/Workflow `model` param |
 | opus-4.8 | 4 | 7 | 8 | Agent/Workflow `model` param |
 | fable-5 | 2 | 9 | 9 | main session, or `model` param |

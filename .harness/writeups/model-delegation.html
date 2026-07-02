@@ -186,8 +186,8 @@
       <p>New "Model Delegation" section in AGENTS.md: ranking table, routing rules, verified mechanics.</p>
     </div>
     <div>
-      <div class="n bad">2 dead paths</div>
-      <p>Fireworks profile has no provider definition; Baseten key never migrated from the old <code>router</code> account.</p>
+      <div class="n bad">2 dead paths found</div>
+      <p>Fireworks profile has no provider definition (still dead); Baseten key hadn't survived the <code>router</code> migration — restored, GLM-5.2 now verified live.</p>
     </div>
   </div>
 </header>
@@ -210,7 +210,7 @@
     <tbody>
       <tr><td>gpt-5.5 via <code>codex exec</code></td><td>codex-cli 0.142.5 at <code>~/.local/bin/codex</code>; <code>~/.codex/config.toml</code> defaults to gpt-5.5, medium reasoning, fast service tier, ChatGPT auth.</td><td><span class="status ok">verified</span></td></tr>
       <tr><td>codex-implementation / -review / -computer-use skills</td><td>Don't exist here. Not needed — mechanics are small enough to inline in AGENTS.md, which every agent reads.</td><td><span class="status warn">inlined instead</span></td></tr>
-      <tr><td>Open-model fallback (Kimi/GLM)</td><td>Fireworks profile references a <code>fireworks</code> provider that is defined nowhere, and no Fireworks API key exists in the keychain — <code>cx fw</code> is currently broken too, likely since a codex update. Baseten GLM-5.2 profile is intact but its keychain item (<code>codex-baseten-api-key</code>) was never migrated from the old <code>router</code> user account.</td><td><span class="status bad">both dead</span></td></tr>
+      <tr><td>Open-model fallback (Kimi/GLM)</td><td>Fireworks profile references a <code>fireworks</code> provider that is defined nowhere, and no Fireworks API key exists in the keychain — <code>cx fw</code> is currently broken too, likely since a codex update. Baseten GLM-5.2 profile was intact but its keychain item (<code>codex-baseten-api-key</code>) hadn't been migrated from the old <code>router</code> user account — restored post-assessment and verified live.</td><td><span class="status warn">fireworks dead · glm restored</span></td></tr>
       <tr><td>"Never use Haiku"</td><td>Kept, with the local rationale: gpt-5.5 and glm-5.2 are cheaper <em>and</em> smarter, so Haiku has no niche.</td><td><span class="status ok">adopted</span></td></tr>
       <tr><td>Codex for computer use / UI verification</td><td>Collides with the existing hard rule that <b>agent-browser is the only browser tool</b>. Reconciled: delegation is allowed, but the codex prompt must instruct it to use agent-browser and close sessions — never its own browser plugins.</td><td><span class="status warn">adapted</span></td></tr>
       <tr><td>Claude models via Agent/Workflow <code>model</code> param</td><td>Confirmed: the param accepts sonnet / opus / haiku / fable only, which is exactly why the wrapper pattern is needed for gpt-5.5.</td><td><span class="status ok">verified</span></td></tr>
@@ -256,18 +256,14 @@
       <tr><td>Same, inside the Claude Code Bash sandbox</td><td>"SANDBOXED_OK" in <b>7.9s</b>, 16.5k tokens — no permission escalation needed for delegation.</td><td><span class="status ok">pass</span></td></tr>
       <tr><td>Wrapper-agent pattern (Sonnet → Bash → codex → report)</td><td>Thin Sonnet wrapper spawned via the Agent tool ran <code>codex exec -C ~/Workspace/dotfiles</code> and returned the report verbatim: <b>MD_COUNT=1</b> in 13.4s end-to-end. (codex skipped hidden dirs when counting — a live demo of why delegated prompts need precise acceptance criteria.)</td><td><span class="status ok">pass</span></td></tr>
       <tr><td><code>codex exec -p fireworks</code></td><td><span class="r">Error: Model provider `fireworks` not found</span> — no provider block anywhere in <code>~/.codex</code>, no keychain key.</td><td><span class="status bad">fail</span></td></tr>
-      <tr><td><code>codex exec -p baseten-glm</code></td><td>Provider and profile resolve, but auth fails: <code>codex-baseten-api-key</code> absent from the login keychain (checked both <code>luiznickel</code> and legacy <code>router</code> accounts).</td><td><span class="status bad">fail — key missing</span></td></tr>
+      <tr><td><code>codex exec -p baseten-glm</code></td><td>Initially failed — <code>codex-baseten-api-key</code> was absent from the login keychain (lost with the deleted <code>router</code> home). After restoring the key: session banner confirms <code>model: zai-org/GLM-5.2, provider: baseten</code>, replies in <b>~4s</b>. (GLM self-reports a wrong name — trust the banner, not the model.)</td><td><span class="status ok">pass — after key restore</span></td></tr>
     </tbody>
   </table>
 </section>
 
 <section>
   <div class="sec-head"><span class="num">05</span><h2>Gaps &amp; tuning knobs</h2></div>
-  <p><b>To restore the GLM path</b> (near-free open-model fallback), re-add the key once:</p>
-  <div class="term">
-    <div class="bar">one-time fix</div>
-    <pre>security add-generic-password -a luiznickel -s codex-baseten-api-key -w <span class="b">'&lt;BASETEN_API_KEY&gt;'</span></pre>
-  </div>
+  <p><b>GLM path: restored.</b> The missing keychain item was re-added post-assessment and the profile verified live (<code>security add-generic-password -a luiznickel -s codex-baseten-api-key -w '&lt;key&gt;'</code> is the recovery command if it's ever lost again).</p>
   <p><b>Fireworks</b> is doubly dead (no provider definition, no key). Either define <code>[model_providers.fireworks]</code> in <code>config.toml</code> with a keychain-backed auth command like Baseten's, or delete <code>fireworks.config.toml</code>, its catalog, and the <code>fw</code> branch of the <code>cx</code> wrapper to stop advertising a path that errors.</p>
   <p><b>Scores are opinions.</b> The table numbers are seeded from the source plus local judgment; tune them as experience accumulates — they're defaults the rules already grant permission to override.</p>
   <p><b>Reasoning effort per delegation.</b> The config default is medium; for hard delegated problems add <code>-c model_reasoning_effort=high</code> (or xhigh) to a single <code>codex exec</code> call instead of editing config.</p>
