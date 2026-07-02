@@ -1,4 +1,5 @@
-model = "gpt-5.5"
+model = "zai-org/GLM-5.2"
+model_catalog_json = "/Users/luiznickel/.codex/model-catalogs/codex-app-custom.json"
 model_context_window = 1050000
 model_auto_compact_token_limit = 900000
 approval_policy = "never"
@@ -7,8 +8,9 @@ network_access = true
 web_search = "live"
 service_tier = "fast"
 
-notify = ["/Users/router/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
-model_reasoning_effort = "xhigh"
+model_reasoning_effort = "medium"
+
+notify = ["/Users/luiznickel/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
 
 [features]
 hooks = true
@@ -23,8 +25,21 @@ chronicle = true
 terminal_resize_reflow = true
 mentions_v2 = true
 
+[agents]
+max_threads = 16
+
 [notice]
 hide_full_access_warning = true
+
+[model_providers.baseten]
+name = "Baseten"
+base_url = "https://inference.baseten.co/v1"
+wire_api = "responses"
+
+[model_providers.baseten.auth]
+command = "/usr/bin/security"
+args = ["find-generic-password", "-a", "luiznickel", "-s", "codex-baseten-api-key", "-w"]
+timeout_ms = 5000
 
 [tui]
 theme = "catppuccin-mocha"
@@ -33,6 +48,9 @@ status_line_use_colors = true
 
 [tui.model_availability_nux]
 "gpt-5.5" = 4
+
+[tui.keymap.global]
+toggle_fast_mode = "ctrl-shift-f"
 
 [mcp_servers.node_repl]
 args = []
@@ -43,27 +61,15 @@ startup_timeout_sec = 120
 NODE_REPL_NATIVE_PIPE_CONNECT_TIMEOUT_MS = "1000"
 NODE_REPL_NODE_MODULE_DIRS = "/Applications/Codex.app/Contents/Resources/cua_node/lib/node_modules"
 NODE_REPL_NODE_PATH = "/Applications/Codex.app/Contents/Resources/cua_node/bin/node"
-NODE_REPL_TRUSTED_CODE_PATHS = "/Users/router/.codex"
-CODEX_HOME = "/Users/router/.codex"
-NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "72614174f4dad67a58d46a3ac759cffb45c92fa48a293af4c4ea35102ba391ba"
+NODE_REPL_TRUSTED_CODE_PATHS = "/Users/luiznickel/.codex"
+CODEX_HOME = "/Users/luiznickel/.codex"
+NODE_REPL_TRUSTED_BROWSER_CLIENT_SHA256S = "d5cbb8ec1ee520cba7943b1e1accb6b25acd9941ea4e2e9e4dbcf25ff9983a2d"
 BROWSER_USE_AVAILABLE_BACKENDS = "chrome,iab"
 NODE_REPL_INSTRUCTIONS_USE_CASE_BROWSER = "Control the in-app browser in conjunction with the Browser Plugin."
 NODE_REPL_INSTRUCTIONS_USE_CASE_CHROME = "Control the Chrome browser in conjunction with the Chrome Plugin. Prefer this method of controlling Chrome over alternatives (such as Computer Use) unless the user explicitly mentions an alternative."
 BROWSER_USE_CODEX_APP_BUILD_FLAVOR = "prod"
-BROWSER_USE_CODEX_APP_VERSION = "26.608.12217"
+BROWSER_USE_CODEX_APP_VERSION = "26.623.70822"
 CODEX_CLI_PATH = "/Applications/Codex.app/Contents/Resources/codex"
-
-[mcp_servers.vercel]
-command = "/Users/router/.local/bin/vercel-sdk-mcp"
-
-[mcp_servers.vercel.tools.projects-filter-project-envs]
-approval_mode = "approve"
-
-[mcp_servers.vercel.tools.projects-get-project-env]
-approval_mode = "approve"
-
-[mcp_servers.vercel.tools.logs-get-runtime-logs]
-approval_mode = "approve"
 
 [plugins."github@openai-curated"]
 enabled = true
@@ -80,9 +86,6 @@ enabled = true
 [plugins."computer-use@openai-bundled"]
 enabled = true
 
-[plugins."vercel@claude-plugins-official"]
-enabled = false
-
 [plugins."linear@openai-curated"]
 enabled = true
 
@@ -93,9 +96,9 @@ enabled = true
 enabled = true
 
 [marketplaces.openai-bundled]
-last_updated = "2026-06-12T01:35:24Z"
+last_updated = "2026-07-01T03:48:19Z"
 source_type = "local"
-source = "/Users/router/.codex/.tmp/bundled-marketplaces/openai-bundled"
+source = "/Users/luiznickel/.codex/.tmp/bundled-marketplaces/openai-bundled"
 
 [marketplaces.openai-primary-runtime]
 last_updated = "2026-06-07T23:47:08Z"
@@ -103,8 +106,8 @@ source_type = "local"
 source = "/Users/router/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
 [marketplaces.claude-plugins-official]
-last_updated = "2026-06-30T17:07:32Z"
-last_revision = "7d0e5f5aae1643db011e905b561fca81776388a6"
+last_updated = "2026-07-02T02:31:52Z"
+last_revision = "6d578313aa15e37f0562afb7535f6d0d5e612040"
 source_type = "git"
 source = "https://github.com/anthropics/claude-plugins-official.git"
 
@@ -266,6 +269,21 @@ trust_level = "trusted"
 [projects."/Users/luiznickel"]
 trust_level = "trusted"
 
+[projects."/Users/luiznickel/Documents/Codex/2026-07-01/new-chat"]
+trust_level = "trusted"
+
+[projects."/Users/luiznickel/Workspace/altura/lemmy"]
+trust_level = "trusted"
+
+[projects."/Users/luiznickel/Workspace/altura/jobs/10x-storefront"]
+trust_level = "trusted"
+
+[projects."/Users/luiznickel/Library/Application Support/com.conductor.app/bin"]
+trust_level = "trusted"
+
+[projects."/Users/luiznickel/Workspace/altura/basso"]
+trust_level = "trusted"
+
 [apps.connector_76869538009648d5b282a4bb21c3d157.tools.github_create_pull_request]
 approval_mode = "approve"
 
@@ -282,12 +300,41 @@ preventSleepWhileRunning = true
 keepRemoteControlAwakeWhilePluggedIn = true
 git-branch-prefix = "feature/"
 git-always-force-push = true
-git-create-pull-request-as-draft = false
+git-create-pull-request-as-draft = true
 git-show-sidebar-pr-icons = true
 conversationDetailMode = "STEPS_COMMANDS"
 appearanceDarkCodeThemeId = "codex"
 show-context-window-usage = true
 usePointerCursors = true
+git-pr-instructions = """
+## Git And PRs
+
+When writing a PR focus on two possible outcomes. Check `.github/pull_request_template.md`.
+
+If it exists:
+
+-  Write `pr.md` using that template; if not, ask how to structure it. Keep PR copy product-facing by default: behavior, workflow impact, business reason, verification, and reviewer-relevant risk. Create the PR. Delete `pr.md` afterwards.
+
+
+If it does not:
+
+Use this template:
+
+```
+you can grab the branch name that *should* be the task id. If that's the case, write here "Closes [taskId]"
+
+## What
+product explained
+
+## Why
+what it aims
+
+## How
+how it is done
+````"""
+git-commit-instructions = """
+- Commit only when asked. Use `<type>(<scope>): <subject>`, with type `feat|fix|docs|style|refactor|test|chore|perf`, subject <= 50 chars, imperative mood, and no trailing period.
+- Never hard-wrap prose in PR/issue bodies and comments. GitHub renders single newlines there as `<br>`, so column-wrapped paragraphs come out as choppy mid-sentence breaks. Put each paragraph and list item on one line and let it soft-wrap. Hard breaks still belong in tables (one row per line) and code/mermaid fences."""
 
 [desktop.open-in-target-preferences]
 global = "ghostty"

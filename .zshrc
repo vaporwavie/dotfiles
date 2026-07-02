@@ -309,3 +309,6 @@ function grok() {
 
 # Pi
 export PATH="/Users/router/.local/share/fnm/node-versions/v22.19.0/installation/bin:$PATH"
+
+# mise (Elixir/Erlang version manager, used by Symphony)
+eval "$(mise activate zsh)"
