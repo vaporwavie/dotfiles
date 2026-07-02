@@ -1,0 +1,5 @@
+model = "moonshotai/Kimi-K2.7-Code"
+model_provider = "baseten"
+web_search = "disabled"
+model_catalog_json = "/Users/luiznickel/.codex/model-catalogs/baseten.json"
+model_reasoning_effort = "high"

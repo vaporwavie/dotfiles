@@ -1,0 +1,57 @@
+#!/usr/bin/env bash
+# cx — Codex launcher with a one-command "Baseten world".
+#
+#   cx                        Codex, your OpenAI default (gpt-5.5)
+#   cx bt                     Codex (TUI) in the Baseten world. Boots Kimi by default;
+#                             press /model to switch Kimi <-> GLM live.
+#   cx bt --glm | --kimi      same, but boot straight into that model
+#   cx app                    Desktop app, OpenAI default
+#   cx app bt [--glm|--kimi]  Desktop app, Baseten world (*)
+#
+#   (*) The desktop picker currently filters out custom-catalog models
+#       (github.com/openai/codex/issues/19694), so in the app you switch
+#       models by relaunching. In the TUI, /model lists both seamlessly.
+#
+# `fw` is accepted as a legacy alias for `bt`; the Fireworks provider is gone.
+# Any other arguments are passed straight through to `codex`.
+set -euo pipefail
+
+readonly KIMI_PROFILE="baseten-kimi"
+readonly GLM_PROFILE="baseten-glm"
+readonly BT_CATALOG="/Users/luiznickel/.codex/model-catalogs/baseten.json"
+readonly KIMI="moonshotai/Kimi-K2.7-Code"
+readonly GLM="zai-org/GLM-5.2"
+
+want_bt=0
+is_app=0
+profile="$KIMI_PROFILE"
+boot_model=""
+passthrough=()
+
+for arg in "$@"; do
+  case "$arg" in
+    bt|--bt|--baseten|fw|--fw|--fireworks) want_bt=1 ;;
+    app)                 is_app=1 ;;
+    --kimi)              want_bt=1; profile="$KIMI_PROFILE"; boot_model="$KIMI" ;;
+    --glm)               want_bt=1; profile="$GLM_PROFILE"; boot_model="$GLM" ;;
+    *)                   passthrough+=("$arg") ;;
+  esac
+done
+
+if [[ $want_bt -eq 0 ]]; then
+  if [[ $is_app -eq 1 ]]; then
+    exec codex app "${passthrough[@]+"${passthrough[@]}"}"
+  fi
+  exec codex "${passthrough[@]+"${passthrough[@]}"}"
+fi
+
+if [[ $is_app -eq 1 ]]; then
+  exec codex app \
+    -c 'model_provider="baseten"' \
+    -c "model=\"${boot_model:-$KIMI}\"" \
+    -c "model_catalog_json=\"$BT_CATALOG\"" \
+    -c 'web_search="disabled"' \
+    "${passthrough[@]+"${passthrough[@]}"}"
+fi
+
+exec codex --profile "$profile" "${passthrough[@]+"${passthrough[@]}"}"
