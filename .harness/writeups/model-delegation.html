@@ -257,6 +257,7 @@
       <tr><td>Wrapper-agent pattern (Sonnet → Bash → codex → report)</td><td>Thin Sonnet wrapper spawned via the Agent tool ran <code>codex exec -C ~/Workspace/dotfiles</code> and returned the report verbatim: <b>MD_COUNT=1</b> in 13.4s end-to-end. (codex skipped hidden dirs when counting — a live demo of why delegated prompts need precise acceptance criteria.)</td><td><span class="status ok">pass</span></td></tr>
       <tr><td><code>codex exec -p fireworks</code></td><td><span class="r">Error: Model provider `fireworks` not found</span> — no provider block anywhere in <code>~/.codex</code>, no keychain key.</td><td><span class="status bad">fail</span></td></tr>
       <tr><td><code>codex exec -p baseten-glm</code></td><td>Initially failed — <code>codex-baseten-api-key</code> was absent from the login keychain (lost with the deleted <code>router</code> home). After restoring the key: session banner confirms <code>model: zai-org/GLM-5.2, provider: baseten</code>, replies in <b>~4s</b>. (GLM self-reports a wrong name — trust the banner, not the model.)</td><td><span class="status ok">pass — after key restore</span></td></tr>
+      <tr><td><code>codex exec -p baseten-kimi</code></td><td>New profile wired post-assessment (Baseten serves <code>moonshotai/Kimi-K2.7-Code</code> on the same endpoint and key; catalog entry + <code>baseten-kimi.config.toml</code> added). Banner confirms the model and provider, reply in <b>3.2s</b>. Replaces the dead Fireworks route for Kimi.</td><td><span class="status ok">pass</span></td></tr>
     </tbody>
   </table>
 </section>
@@ -264,7 +265,7 @@
 <section>
   <div class="sec-head"><span class="num">05</span><h2>Gaps &amp; tuning knobs</h2></div>
   <p><b>GLM path: restored.</b> The missing keychain item was re-added post-assessment and the profile verified live (<code>security add-generic-password -a luiznickel -s codex-baseten-api-key -w '&lt;key&gt;'</code> is the recovery command if it's ever lost again).</p>
-  <p><b>Fireworks</b> is doubly dead (no provider definition, no key). Either define <code>[model_providers.fireworks]</code> in <code>config.toml</code> with a keychain-backed auth command like Baseten's, or delete <code>fireworks.config.toml</code>, its catalog, and the <code>fw</code> branch of the <code>cx</code> wrapper to stop advertising a path that errors.</p>
+  <p><b>Fireworks</b> is doubly dead (no provider definition, no key) and now redundant: both of its models are served through Baseten (<code>baseten-glm</code>, <code>baseten-kimi</code>). Delete <code>fireworks.config.toml</code>, its catalog, and the <code>fw</code> branch of the <code>cx</code> wrapper to stop advertising a path that errors.</p>
   <p><b>Scores are opinions.</b> The table numbers are seeded from the source plus local judgment; tune them as experience accumulates — they're defaults the rules already grant permission to override.</p>
   <p><b>Reasoning effort per delegation.</b> The config default is medium; for hard delegated problems add <code>-c model_reasoning_effort=high</code> (or xhigh) to a single <code>codex exec</code> call instead of editing config.</p>
   <p><b>Ephemeral by default.</b> <code>--ephemeral</code> keeps delegated one-shots out of <code>~/.codex/sessions</code>; drop it when you want <code>codex exec resume</code> to be able to continue the delegated thread.</p>

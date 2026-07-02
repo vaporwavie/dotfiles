@@ -52,6 +52,7 @@ When orchestrating subagents/workflows or handing off work, pick models by these
 |---|---|---|---|---|
 | gpt-5.5 | 9 | 8 | 5 | `codex exec` (my `~/.codex/config.toml` default) |
 | glm-5.2 | 9 | 6 | 4 | `codex exec -p baseten-glm` |
+| kimi-k2.7 | 9 | 6 | 5 | `codex exec -p baseten-kimi` |
 | sonnet-5 | 5 | 5 | 7 | Agent/Workflow `model` param |
 | opus-4.8 | 4 | 7 | 8 | Agent/Workflow `model` param |
 | fable-5 | 2 | 9 | 9 | main session, or `model` param |
@@ -64,7 +65,7 @@ How to apply:
 - Token-hungry work (computer use, whole-codebase analysis, long log digs) must not run in the orchestrator's own context: delegate it and have only the result reported back.
 - Anything user-facing (UI, copy, API design) needs taste ≥ 7.
 - Reviews of plans/implementations: fable-5 or opus-4.8, optionally gpt-5.5 (`codex exec review`) as an extra independent perspective.
-- Don't use Haiku; gpt-5.5 and glm-5.2 are cheaper and smarter.
+- Don't use Haiku; gpt-5.5, glm-5.2, and kimi-k2.7 are cheaper and smarter.
 
 Mechanics:
 
